@@ -1,0 +1,130 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:omkar_app/controller/cartController.dart';
+import 'package:omkar_app/Theme/nativeTheme.dart';
+
+import '../../utils/string_res.dart';
+
+class PriceDetailsWidget extends StatelessWidget {
+  PriceDetailsWidget({Key? key}) : super(key: key);
+
+  final CartController cartController = Get.find();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.white,
+      padding: EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            StringRes.priceDetails,
+            style: Themes.light.textTheme.displayMedium!.copyWith(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Item total
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(StringRes.itemTotal, style: TextStyle(fontSize: 14)),
+              Obx(
+                () => Text(
+                  "₹${cartController.cartTotal.value?.totalInteger ?? 0}",
+                  style: const TextStyle(fontSize: 14),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+
+          // Delivery fee
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(StringRes.deliveryFee, style: TextStyle(fontSize: 14)),
+              Text(
+                StringRes.free,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.green,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+
+          // Discount
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(StringRes.discount, style: TextStyle(fontSize: 14)),
+              Obx(
+                () => Text(
+                  "-₹${cartController.cartTotal.value?.save ?? 0}",
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.green,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          const Divider(),
+          const SizedBox(height: 16),
+
+          // Total amount
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                StringRes.totalAmount,
+                style: Themes.light.textTheme.displayMedium!.copyWith(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Obx(
+                () => Text(
+                  "₹${cartController.cartTotal.value?.totalInteger ?? 0}",
+                  style: Themes.light.textTheme.displayMedium!.copyWith(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // Savings
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.green.shade50,
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Obx(
+              () => Text(
+                "${StringRes.youWillSave} ₹${cartController.cartTotal.value?.save ?? 0} on this order",
+                style: const TextStyle(
+                  color: Colors.green,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

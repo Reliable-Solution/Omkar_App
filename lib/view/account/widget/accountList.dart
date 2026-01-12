@@ -1,0 +1,128 @@
+//flutter
+import 'package:flutter/material.dart';
+//package
+import 'package:get/get.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:omkar_app/utils/string_res.dart';
+// utils
+import '/utils/global.dart' as global;
+//theme
+
+import '../../../Theme/nativeTheme.dart';
+import '../../../constant/colorConst.dart';
+import '../../../widget/alignWidget.dart';
+import '../../../widget/dividerWidgets.dart';
+import '../../../widget/iconButtonWidget.dart';
+import '../../../widget/textWidget.dart';
+
+class AccountList extends StatelessWidget {
+  const AccountList({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: COLOR.background,
+      child: Column(children: []),
+    );
+  }
+
+  void openBottomRate(BuildContext context) {
+    Get.bottomSheet(
+      SizedBox(
+        height: MediaQuery.of(context).size.height * 0.4,
+        child: Padding(
+          padding: const EdgeInsets.all(15),
+          child: Column(
+            children: [
+              AlignWidget(
+                alignment: Alignment.topRight,
+                child: IconButtonWidget(
+                  voidCallback: () {
+                    Get.back();
+                  },
+                  icons: Icons.close,
+                ),
+              ),
+              Column(
+                children: [
+                  TextWiget(
+                    title: StringRes.rateUsQuestion,
+                    style: Themes.dark.textTheme.headlineMedium,
+                    textAlign: TextAlign.center,
+                  ),
+                  TextWiget(
+                    title: StringRes.store,
+                    style: Themes.dark.textTheme.headlineMedium,
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+              Container(
+                color: COLOR.background,
+                alignment: Alignment.center,
+                padding: EdgeInsets.only(top: 10, bottom: 10),
+                child: FittedBox(
+                  child: TextWiget(
+                    title: StringRes.feedbackText,
+                    style: Themes.light.textTheme.displayLarge!.copyWith(
+                      color: COLOR.grey,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+              Column(
+                children: [
+                  RatingBar.builder(
+                    initialRating: 0,
+                    minRating: 0,
+                    direction: Axis.horizontal,
+                    allowHalfRating: true,
+                    itemCount: 5,
+                    itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                    itemBuilder: (context, _) =>
+                        Icon(Icons.star, size: 25, color: COLOR.amber),
+                    onRatingUpdate: (rating) {
+                      print(rating);
+                    },
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      TextWiget(
+                        title: StringRes.worst,
+                        style: Themes.dark.textTheme.displayMedium!.copyWith(
+                          color: COLOR.grey,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 5),
+                        child: TextWiget(
+                          title: StringRes.best,
+                          style: Themes.dark.textTheme.displayMedium!.copyWith(
+                            color: COLOR.grey,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+      isScrollControlled: true,
+      backgroundColor: COLOR.background,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(10),
+          topRight: Radius.circular(10),
+        ),
+      ),
+    );
+  }
+}
