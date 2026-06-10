@@ -76,7 +76,7 @@ class ServicesShimmer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
+    return Column(
       children: [
         Container(
           margin: EdgeInsets.symmetric(

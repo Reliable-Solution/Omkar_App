@@ -5,10 +5,9 @@ import 'package:omkar_app/models/addressModel.dart';
 
 String API_URL =
     // " ";
-    "https://staging.ewaappliances.in//Admin/Ajax/";
+    "https://staging.ewaappliances.in/Admin/Ajax/";
 // String API_URL = "https://keep.reliablesolution.in/Admin/Ajax/";
-String IMAGE_URL =
-    "https://staging.ewaappliances.in/resources/images/";
+String IMAGE_URL = "https://staging.ewaappliances.in/resources/images/";
 // String IMAGE_URL = "https://keep.reliablesolution.in/resources/images/";
 String? firmId = "1";
 

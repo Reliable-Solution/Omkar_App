@@ -133,11 +133,11 @@ class SubCategoryController extends GetxController {
   //       categoryProductList.value = data
   //           .map<ProductModel>((e) => ProductModel.fromJson(e))
   //           .toList();
-  //       print("✅ Parsed products: ${categoryProductList.length}");
+  //       print(" Parsed products: ${categoryProductList.length}");
   //       isCategoryProduct.value = false;
   //
   //     } else {
-  //       print("⚠️ Data is null or empty list");
+  //       print(" Data is null or empty list");
   //       categoryProductList.value = [];
   //       isCategoryProduct.value = false;
   //     }

@@ -13,7 +13,7 @@ class AppStyles {
   // static const primaryColor = Color(0xFFb76e79);
   // static const primaryColor = Color(0xFFb47f47);
   // static const primaryColor = Color(0xFF383938);
-  static const primaryColor = Color(0xff226706);
+  static const primaryColor = Color(0xff16635C);
   static const drawerTextColor = Color(0xFF31649E);
   // static const primaryColor = Color(0xFF958471);
   static const secondaryColor = Color(0xFFEEC14C);

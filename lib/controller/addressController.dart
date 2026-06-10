@@ -73,24 +73,26 @@ class AddressController extends GetxController {
   }
 
   void searchCategory(String query) {
-    isSearching.value = true; // ✅ Start loader
+    isSearching.value = true; //  Start loader
 
     Future.delayed(Duration(milliseconds: 500), () {
       if (query.isEmpty) {
         filteredList.assignAll(allAddressList);
       } else {
         filteredList.assignAll(
-          allAddressList.where((item) =>
-              item.addressFullName!
-                  .toLowerCase()
-                  .contains(query.toLowerCase()) ||
-              item.addressMobileNo!
-                  .toLowerCase()
-                  .contains(query.toLowerCase()) ||
-              item.addressColony!.toLowerCase().contains(query.toLowerCase())),
+          allAddressList.where(
+            (item) =>
+                item.addressFullName!.toLowerCase().contains(
+                  query.toLowerCase(),
+                ) ||
+                item.addressMobileNo!.toLowerCase().contains(
+                  query.toLowerCase(),
+                ) ||
+                item.addressColony!.toLowerCase().contains(query.toLowerCase()),
+          ),
         );
       }
-      isSearching.value = false; // ✅ Stop loader after filtering
+      isSearching.value = false; //  Stop loader after filtering
     });
   }
 
@@ -106,7 +108,7 @@ class AddressController extends GetxController {
         "Address": addressModel.addressColony,
         "AddressLandmark": addressModel.addressLandmark,
         "AddressType": addressModel.addressType,
-        'FirmId': firmId
+        'FirmId': firmId,
       };
 
       var response = await ApiService.post(endpoint: addAddress, body: body);
@@ -145,7 +147,7 @@ class AddressController extends GetxController {
       // allAddressList.clear();
       final Map<String, dynamic> body = {
         "CustomerId": customerModel!.value.customerId,
-        'FirmId': firmId
+        'FirmId': firmId,
       };
 
       var response = await ApiService.post(endpoint: getAddress, body: body);
@@ -182,14 +184,17 @@ class AddressController extends GetxController {
       final Map<String, dynamic> body = {
         "CustomerId": customerId,
         "AddressId": addressId,
-        'FirmId': firmId
+        'FirmId': firmId,
       };
 
-      var response =
-          await ApiService.post(endpoint: deleteAddressApi, body: body);
+      var response = await ApiService.post(
+        endpoint: deleteAddressApi,
+        body: body,
+      );
       if (response.data['IsSuccess'] == true) {
-        int index =
-            allAddressList.indexWhere((item) => item.addressId == addressId);
+        int index = allAddressList.indexWhere(
+          (item) => item.addressId == addressId,
+        );
         allAddressList.removeAt(index);
         update();
       } else {
@@ -214,7 +219,7 @@ class AddressController extends GetxController {
         "AddressLandmark": addressModel.addressLandmark,
         "AddressType": addressModel.addressType,
         "AddressId": addressId,
-        'FirmId': firmId
+        'FirmId': firmId,
       };
       var response = await ApiService.post(endpoint: updateAddress, body: body);
       print(" Add Update Address data ${response.data}");
@@ -224,7 +229,8 @@ class AddressController extends GetxController {
         );
         // allAddressList[index] = addressModel;
         print(
-            "All Address IDs: ${allAddressList.map((e) => e.addressId).toList()}");
+          "All Address IDs: ${allAddressList.map((e) => e.addressId).toList()}",
+        );
 
         print("Update Address Data ${allAddressList.length}");
         if (index != -1) {
@@ -263,8 +269,10 @@ class AddressController extends GetxController {
   }
 
   // Address Delete Karne Ka Function
-  void deleteSelectAddressData(
-      {required int customerId, required int addressId}) {
+  void deleteSelectAddressData({
+    required int customerId,
+    required int addressId,
+  }) {
     allAddressList.removeWhere((address) => address.addressId == addressId);
     if (selectedAddressId.value == addressId.toString()) {
       selectedAddressId.value =

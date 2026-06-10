@@ -521,142 +521,149 @@
 //     );
 //   }
 
-//   void _showLogoutBottomSheet(BuildContext context) {
-//     Get.bottomSheet(
-//       SafeArea(
-//         bottom: true,
-//         child: Container(
-//           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-//           decoration: BoxDecoration(
-//             color: Colors.white,
-//             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-//           ),
-//           child: Column(
-//             mainAxisSize: MainAxisSize.min,
-//             children: [
-//               Text(
-//                 StringRes.logoutConfirmation,
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-//                 // "Are you sure you want to logout?",
-//                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-//               ),
-//               const SizedBox(height: 20),
-//               Row(
-//                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//                 children: [
-//                   ElevatedButton(
-//                     style: ElevatedButton.styleFrom(
-//                       foregroundColor: Colors.black,
-//                       backgroundColor: Colors.white,
-//                       side: BorderSide(color: Colors.black),
-//                     ),
-//                     onPressed: () => Get.back(),
-//                     child: Text(
-//                       StringRes.cancel,
-//                       style: TextStyle(fontSize: 16),
-//                     ),
-//                   ),
-//                   ElevatedButton(
-//                     style: ElevatedButton.styleFrom(
-//                       backgroundColor: COLOR.appBaseColor,
-//                       foregroundColor: Colors.white,
-//                     ),
-//                     onPressed: () async {
-//                       SharedHelper helper = SharedHelper();
-//                       await helper
-//                           .deleteCustomer(); // agar yeh async method hai\
-//                       // await helper.storeBool(value: true,key: SharedHelper.deleteAccountKey);
-//                       await authenticate.signOut();
-//                       Get.offAll(() => LoginScreen());
-//                       // Logout logic here
-//                       Get.back();
-//                     },
-//                     child: Text(
-//                       StringRes.logout,
-//                       style: TextStyle(fontSize: 16),
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//       isDismissible: true,
-//       enableDrag: true,
-//       enterBottomSheetDuration: Duration(milliseconds: 300),
-//       exitBottomSheetDuration: Duration(milliseconds: 300),
-//     );
-//   }
+import '../../constant/colorConst.dart';
+import '../../constant/imagesConst.dart';
+import '../../controller/homeController.dart';
+import '../../controller/authController.dart';
 
-//   void _showDeleteBottomSheet(BuildContext context) {
-//     Get.bottomSheet(
-//       SafeArea(
-//         bottom: true,
-//         child: Container(
-//           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-//           decoration: BoxDecoration(
-//             color: Colors.white,
-//             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-//           ),
-//           child: Column(
-//             mainAxisSize: MainAxisSize.min,
-//             children: [
-//               Text(
-//                 StringRes.logoutConfirmation,
-//                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-//               ),
-//               const SizedBox(height: 20),
-//               Row(
-//                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//                 children: [
-//                   ElevatedButton(
-//                     style: ElevatedButton.styleFrom(
-//                       foregroundColor: Colors.black,
-//                       backgroundColor: Colors.white,
-//                       side: BorderSide(color: Colors.black),
-//                     ),
-//                     onPressed: () => Get.back(),
-//                     child: Text(
-//                       StringRes.cancel,
-//                       style: TextStyle(fontSize: 16),
-//                     ),
-//                   ),
-//                   ElevatedButton(
-//                     style: ElevatedButton.styleFrom(
-//                       backgroundColor: COLOR.appBaseColor,
-//                       foregroundColor: Colors.white,
-//                     ),
-//                     onPressed: () async {
-//                       SharedHelper helper = SharedHelper();
-//                       await helper
-//                           .deleteCustomer(); // agar yeh async method hai\
-//                       await helper.storeBool(
-//                         value: true,
-//                         key: SharedHelper.deleteAccountKey,
-//                       );
-//                       await authenticate.signOut();
-//                       Get.offAll(() => LoginScreen());
-//                       // Logout logic here
-//                       Get.back();
-//                     },
-//                     child: Text(
-//                       StringRes.delete,
-//                       style: TextStyle(fontSize: 16),
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//       isDismissible: true,
-//       enableDrag: true,
-//       enterBottomSheetDuration: Duration(milliseconds: 300),
-//       exitBottomSheetDuration: Duration(milliseconds: 300),
-//     );
-//   }
+import '../../utils/string_res.dart';
+import '../../utils/sharedPrefs.dart';
+
+import '../address/allAddress_screen.dart';
+import '../faq/faq_screen.dart';
+
+import '../raise ticket/ticketMainScreen.dart';
+import 'editProfile.dart';
+import 'qr_scanner_view.dart';
+import '../../constant/app_constant.dart';
+import '../scan_history/scan_history_screen.dart';
+import '../redeem/withdraw_point_screen.dart';
+
+void _showLogoutBottomSheet(BuildContext context) {
+  Get.bottomSheet(
+    SafeArea(
+      bottom: true,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              StringRes.logoutConfirmation,
+
+              // "Are you sure you want to logout?",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.black,
+                    backgroundColor: Colors.white,
+                    side: BorderSide(color: Colors.black),
+                  ),
+                  onPressed: () => Get.back(),
+                  child: Text(StringRes.cancel, style: TextStyle(fontSize: 16)),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: COLOR.appBaseColor,
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () async {
+                    AuthController authController = Get.put(AuthController());
+                    await authController.signOut();
+                  },
+                  child: Text(StringRes.logout, style: TextStyle(fontSize: 16)),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ),
+    isDismissible: true,
+    enableDrag: true,
+    enterBottomSheetDuration: Duration(milliseconds: 300),
+    exitBottomSheetDuration: Duration(milliseconds: 300),
+  );
+}
+
+void _showDeleteBottomSheet(BuildContext context) {
+  Get.bottomSheet(
+    SafeArea(
+      bottom: true,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              StringRes.deleteAccountConfirmation,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.black,
+                    backgroundColor: Colors.white,
+                    side: BorderSide(color: Colors.black),
+                  ),
+                  onPressed: () => Get.back(),
+                  child: Text(StringRes.cancel, style: TextStyle(fontSize: 16)),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () async {
+                    SharedHelper helper = SharedHelper();
+                    await helper.deleteCustomer();
+                    await helper.storeBool(
+                      value: true,
+                      key: SharedHelper.deleteAccountKey,
+                    );
+                    AuthController authController = Get.find<AuthController>();
+                    await authController.signOut();
+                    Get.showSnackbar(
+                      GetSnackBar(
+                        message: StringRes.accountDeleted,
+                        duration: Duration(seconds: 3),
+                      ),
+                    );
+                  },
+                  child: Text(StringRes.delete, style: TextStyle(fontSize: 16)),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ),
+    isDismissible: true,
+    enableDrag: true,
+    enterBottomSheetDuration: Duration(milliseconds: 300),
+    exitBottomSheetDuration: Duration(milliseconds: 300),
+  );
+}
 
 //   void openBottomSheetOTP(BuildContext context) {
 //     Get.bottomSheet(
@@ -761,19 +768,19 @@
 //   }
 // }
 
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:omkar_app/Theme/nativeTheme.dart'; // assuming your theme
-import 'package:omkar_app/constant/colorConst.dart';
-import 'package:omkar_app/constant/imagesConst.dart';
-import 'package:omkar_app/controller/homeController.dart';
-import 'package:omkar_app/utils/string_res.dart';
-import 'package:omkar_app/view/account/editProfile.dart';
-import 'package:omkar_app/view/account/widget/accountList.dart'; // if you still need it
-import 'package:omkar_app/view/address/allAddress_screen.dart';
-import 'package:omkar_app/view/faq/faq_screen.dart';
-import 'package:omkar_app/view/order/orderScreen.dart';
-import 'package:omkar_app/view/raise%20ticket/ticketMainScreen.dart';
+// import 'package:flutter/material.dart';
+// import 'package:get/get.dart';
+// import 'package:omkar_app/Theme/nativeTheme.dart'; // assuming your theme
+// import 'package:omkar_app/constant/colorConst.dart';
+// import 'package:omkar_app/constant/imagesConst.dart';
+// import 'package:omkar_app/controller/homeController.dart';
+// import 'package:omkar_app/utils/string_res.dart';
+// import 'package:omkar_app/view/account/editProfile.dart';
+// import 'package:omkar_app/view/account/widget/accountList.dart'; // if you still need it
+// import 'package:omkar_app/view/address/allAddress_screen.dart';
+// import 'package:omkar_app/view/faq/faq_screen.dart';
+// import 'package:omkar_app/view/order/orderScreen.dart';
+// import 'package:omkar_app/view/raise%20ticket/ticketMainScreen.dart';
 // ... other imports you need
 
 class AccountScreen extends StatelessWidget {
@@ -786,7 +793,7 @@ class AccountScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white54,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: COLOR.appBaseColor,
         elevation: 0,
         // leading: IconButton(
         //   icon: const Icon(Icons.arrow_back, color: Colors.black87),
@@ -795,12 +802,12 @@ class AccountScreen extends StatelessWidget {
         title: Text(
           "Profile",
           style: TextStyle(
-            color: Colors.black87,
+            color: COLOR.background,
             fontWeight: FontWeight.w600,
             fontSize: 20,
           ),
         ),
-        centerTitle: true,
+        // centerTitle: true,
       ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
@@ -809,6 +816,7 @@ class AccountScreen extends StatelessWidget {
             // ── Profile Header ────────────────────────────────
             Column(
               children: [
+                SizedBox(height: 20),
                 // Circular avatar with nice ring effect
                 Stack(
                   alignment: Alignment.center,
@@ -828,16 +836,36 @@ class AccountScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundColor: Colors.white,
-                      child: CircleAvatar(
-                        radius: 47,
-                        backgroundImage: AssetImage(Images.profileicon),
-                        // Agar real image chahiye to NetworkImage use kar sakte ho
-                        // backgroundImage: controller.customerModel?.value.profilePic != null
-                        //     ? NetworkImage(controller.customerModel!.value.profilePic!)
-                        //     : AssetImage(Images.profileicon),
+                    Obx(
+                      () => CircleAvatar(
+                        radius: 50,
+                        backgroundColor: Colors.white,
+                        child: CircleAvatar(
+                          radius: 47,
+                          backgroundColor: COLOR.greyLight,
+                          backgroundImage:
+                              (controller.customerModel?.value.customerImage !=
+                                      null &&
+                                  controller
+                                      .customerModel!
+                                      .value
+                                      .customerImage!
+                                      .isNotEmpty)
+                              ? NetworkImage(
+                                      controller
+                                              .customerModel!
+                                              .value
+                                              .customerImage!
+                                              .startsWith('http')
+                                          ? controller
+                                                .customerModel!
+                                                .value
+                                                .customerImage!
+                                          : "$IMAGE_URL${controller.customerModel!.value.customerImage}",
+                                    )
+                                    as ImageProvider
+                              : AssetImage(Images.profileicon),
+                        ),
                       ),
                     ),
                   ],
@@ -858,10 +886,12 @@ class AccountScreen extends StatelessWidget {
 
                 const SizedBox(height: 6),
 
-                Text(
-                  controller.customerModel?.value.customerPhoneNo ??
-                      "Not Available",
-                  style: TextStyle(fontSize: 15, color: Colors.grey.shade700),
+                Obx(
+                  () => Text(
+                    controller.customerModel?.value.customerPhoneNo ??
+                        "Not Available",
+                    style: TextStyle(fontSize: 15, color: Colors.grey.shade700),
+                  ),
                 ),
 
                 const SizedBox(height: 4),
@@ -875,11 +905,12 @@ class AccountScreen extends StatelessWidget {
 
                 // Edit Profile Button
                 OutlinedButton.icon(
-                  onPressed: () {
-                    Get.to(
+                  onPressed: () async {
+                    await Get.to(
                       () => EditProfileScreen(),
                       transition: Transition.rightToLeftWithFade,
                     );
+                    await controller.getPrefs(); // Reload data on return
                   },
                   icon: const Icon(Icons.edit_outlined, size: 18),
                   label: const Text("Edit Profile"),
@@ -912,16 +943,53 @@ class AccountScreen extends StatelessWidget {
             // ),
 
             // SizedBox(child: Divider(color: Colors.black12,height: 0.5,),width: MediaQuery.sizeOf(context).width * 0.9,),
-            _buildMenuTile(
-              icon: Icons.location_on_outlined,
-              title: "Shipping Address",
-              onTap: () => Get.to(
-                () => AllAddressScreen(),
-                transition: Transition.rightToLeftWithFade,
-              ),
-              context: context,
-            ),
+            // _buildMenuTile(
+            //   icon: Icons.location_on_outlined,
+            //   title: "Shipping Address",
+            //   onTap: () => Get.to(
+            //     () => AllAddressScreen(),
+            //     transition: Transition.rightToLeftWithFade,
+            //   ),
+            //   context: context,
+            // ),
 
+            // Obx(
+            //   () => controller.customerModel?.value.role == "carpenter"
+            //       ? Column(
+            //           children: [
+            //             _buildMenuTile(
+            //               icon: Icons.barcode_reader,
+            //               title: "Barcode Scan",
+            //               onTap: () async {
+            //                 await Get.to(
+            //                   () => const QRScannerView(),
+            //                   transition: Transition.rightToLeftWithFade,
+            //                 );
+            //               },
+            //               context: context,
+            //             ),
+            //             _buildMenuTile(
+            //               icon: Icons.history_rounded,
+            //               title: "Scan History",
+            //               onTap: () => Get.to(
+            //                 () => const ScanHistoryScreen(),
+            //                 transition: Transition.rightToLeftWithFade,
+            //               ),
+            //               context: context,
+            //             ),
+            //           ],
+            //         )
+            //       : const SizedBox(),
+            // ),
+            // _buildMenuTile(
+            //   icon: Icons.account_balance_wallet_outlined,
+            //   title: "Withdraw Points",
+            //   onTap: () => Get.to(
+            //     () => const WithdrawPointScreen(),
+            //     transition: Transition.rightToLeftWithFade,
+            //   ),
+            //   context: context,
+            // ),
             _buildMenuTile(
               icon: Icons.question_answer_outlined,
               title: "FAQ",
@@ -963,10 +1031,20 @@ class AccountScreen extends StatelessWidget {
             _buildMenuTile(
               icon: Icons.logout,
               title: "Log out",
+              color: Colors.grey.shade700,
+              onTap: () {
+                _showLogoutBottomSheet(context);
+                // Get.snackbar("Logout", "Coming soon...");
+              },
+              context: context,
+            ),
+
+            _buildMenuTile(
+              icon: Icons.delete_forever_outlined,
+              title: StringRes.deleteAccount,
               color: Colors.red.shade700,
               onTap: () {
-                // _showLogoutBottomSheet(context);
-                Get.snackbar("Logout", "Coming soon...");
+                _showDeleteBottomSheet(context);
               },
               context: context,
             ),
@@ -1058,7 +1136,7 @@ class AccountScreen extends StatelessWidget {
         ),
         SizedBox(
           width: MediaQuery.sizeOf(context).width * 0.95,
-          child: Divider(color: Colors.black26, height: 0.5),
+          child: Divider(color: Colors.black12, height: 0.5),
         ),
       ],
     );

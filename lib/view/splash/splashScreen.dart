@@ -106,7 +106,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:omkar_app/controller/editController.dart';
 import 'package:omkar_app/controller/homeController.dart';
-import 'package:omkar_app/view/splash/stroreDetection_screen.dart';
 // import 'package:flutter_splash/controllers/splash_controller.dart';
 
 import '../../constant/colorConst.dart';
@@ -116,6 +115,7 @@ import '../../utils/sharedPrefs.dart';
 import '../../utils/string_res.dart';
 import '../dashboard/dashboardScreen.dart';
 import '../otp/phone_auth.dart';
+import '../role_selection/user_role_selection.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -202,33 +202,39 @@ class _SplashScreenState extends State<SplashScreen>
 
     Future.delayed(const Duration(seconds: 2), () {
       _transitionController.forward().then((_) async {
+        debugPrint(
+          "🏁 [SplashScreen] Animation done, checking login status...",
+        );
         CustomerModel? customerModel = await helper.getCustomer();
 
-        Future.delayed(const Duration(milliseconds: 500), () async {
+        if (customerModel == null || customerModel.customerId == null) {
+          debugPrint(
+            "🚫 [SplashScreen] No valid customer found, going to Role Selection",
+          );
           Get.off(
-            customerModel == null
-                ? LoginScreen()
-                : DashboardScreen(pageIndex: 0),
+            () => UserRoleSelection(),
+            transition: Transition.fade,
+            duration: const Duration(milliseconds: 500),
+          );
+        } else {
+          debugPrint(
+            " [SplashScreen] Customer found: ${customerModel.customerName}, going to Dashboard",
+          );
+          // Critical: update homeController reactive model
+          homeController.customerModel?.value = customerModel;
+
+          Get.off(
+            () => DashboardScreen(pageIndex: 0),
             transition: Transition.fade,
             duration: const Duration(milliseconds: 500),
           );
 
-          // Navigator.of(context).pushReplacement(
-          //   PageRouteBuilder(
-          //     pageBuilder: (context, animation, secondaryAnimation) => DashboardScreen(pageIndex: 0),
-          //     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          //       return FadeTransition(opacity: animation, child: child);
-          //     },
-          //     transitionDuration: Duration(milliseconds: 800),
-          //   ),
-          // );
-          editProfileController.GetProfile(
-            customerId: homeController.customerModel!.value.customerId!,
+          // Background refresh
+          await editProfileController.GetProfile(
+            customerId: customerModel.customerId!,
           );
-          homeController.getDashboardData(
-            homeController.customerModel!.value.customerId,
-          );
-        });
+          await homeController.getDashboardData(customerModel.customerId);
+        }
       });
     });
   }

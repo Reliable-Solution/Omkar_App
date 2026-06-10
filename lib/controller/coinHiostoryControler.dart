@@ -38,12 +38,12 @@ class CoinHistoryController extends GetxController {
           customer.customerId!.isNotEmpty) {
         customerModel?.value = customer;
         customerId = customer.customerId!;
-        debugPrint("✅ Id: $customerId");
+        debugPrint(" Id: $customerId");
         await fetchHistory(
           customerId: customerId,
         ); // Await to ensure sequential
       } else {
-        debugPrint("❌ Customer ID not found or invalid");
+        debugPrint("Customer ID not found or invalid");
         // Get.snackbar('Error', 'Customer ID not available');
         // Optionally handle no customer: redirect to login etc.
       }
@@ -58,7 +58,7 @@ class CoinHistoryController extends GetxController {
     //   customerModel!.value = customer;
     //   customerId = customerModel?.value.customerId ?? "";
     //   fetchHistory(customerId: customerId);
-    //   debugPrint("✅ Id: ${customer.customerId}");
+    //   debugPrint(" Id: ${customer.customerId}");
     //   update(); // agar tu GetBuilder bhi use kar raha hai
     // }
   }

@@ -126,22 +126,19 @@ class _ReferAndEarnScreenState extends State<ReferAndEarnScreen>
 
   void _handleShare() async {
     final String shareText =
-        '🌱 Hey there! I am using JantuNashak – a smart Agriculture app for farmers.\n\n'
+        '🌱 Hey there! I am using Ewa Appliances – a smart Agriculture app for farmers.\n\n'
         '🚜 Get the latest crop prices, expert tips, seeds, fertilizers, and much more.\n\n'
         '✨ Use my *Referral Code*:\n'
         '🔑 👉 [$referralCode] 👈\n'
         '📲 Download now & make your farming smarter.\n'
         'Also, both of us can earn rewards up to ₹500!\n';
-    // 'Download now and make your farming smarter.';
-    // final String shareText =
-    //     'Hey friends! Get amazing deals on this awesome app. Use my referral code $referralCode to get ₹250 off your first order and a chance to earn up to ₹500!';
+
     final String shareUrl =
-        'Download the JantuNashak App for get better Product at Farmers.\n\nhttps://play.google.com/store/apps/details?id=com.reliable.jantunashak';
-    // 'https://yourapplink.com/refer ';
+        'Download the Ewa Appliances App for dedicated rewards and scanner.\n\nhttps://play.google.com/store/apps/details?id=com.ewa.reliable';
 
     await Share.share(
       '$shareText $shareUrl',
-      subject: 'Shopees Referral Invite',
+      subject: 'Ewa Appliances Referral Invite',
     );
   }
 

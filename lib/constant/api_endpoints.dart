@@ -45,3 +45,7 @@ const String getProductbyID = 'getProductbyID';
 const String getPrizeData = 'getPrizeData';
 const String getMonthlyData = 'getMonthlyData';
 const String get_history = 'Get_history';
+const String redeemPointsApi = 'Redeem';
+const String getWalletDataApi = 'getwalletData';
+const String getScannedProduct = 'Get_Scanned_Product';
+const String addInquiry = 'Inquiry';

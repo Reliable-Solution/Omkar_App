@@ -50,12 +50,9 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:omkar_app/constant/app_constant.dart';
-import 'package:omkar_app/constant/colorConst.dart';
 import 'package:omkar_app/models/settingModel.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constant/api_endpoints.dart';
-import '../models/customerModel.dart';
 import '../models/firmModel.dart';
 import '../utils/services/api_services.dart';
 import '../utils/sharedPrefs.dart';
@@ -118,135 +115,116 @@ class SplashController extends GetxController with GetTickerProviderStateMixin {
 
   /// Get Firm all data
   Future<void> getFirm() async {
-    // try {
-    //   isLoading.value = false;
-    //   update();
+    try {
+      isLoading.value = true;
+      update();
 
-    //   final connectivityResult = await Connectivity().checkConnectivity();
-    //   if (connectivityResult == ConnectivityResult.none) {
-    //     hasInternet.value = false;
-    //     checkException.value = "No Internet Connection";
-    //     return;
-    //   } else {
-    //     hasInternet.value = true;
-    //   }
-    //   print("Api for get_firm ${ApiService.baseUrl + get_firms}");
-    //   var response = await ApiService.get(get_firms);
+      final connectivityResult = await Connectivity().checkConnectivity();
+      if (connectivityResult == ConnectivityResult.none) {
+        hasInternet.value = false;
+        checkException.value = "No Internet Connection";
+        return;
+      } else {
+        hasInternet.value = true;
+      }
 
-    //   print("Api Data getFirms Data ${response.data}");
-    //   if (response.data['IsSuccess'] == true) {
-    //     print("API Response: ${response.data}");
+      var response = await ApiService.get(get_firms);
 
-    //     FirmModel firmModel = FirmModel.fromJson(response.data);
+      if (response.data['IsSuccess'] == true) {
+        FirmModel firmModel = FirmModel.fromJson(response.data);
 
-    //     if (firmModel.data != null && firmModel.data!.isNotEmpty) {
-    //       firmList = firmModel.data!;
+        if (firmModel.data != null && firmModel.data!.isNotEmpty) {
+          firmList = firmModel.data!;
+        }
 
-    //       // String firmId = firmList[0].firmId ?? '';
-    //       // await helper.storeString("firmIdKey", firmId);
-    //       // print("Saved firm ID: $firmId");
-    //     }
+        isLoading.value = false;
+        update();
+      } else {
+        print(response.data['Message']);
+        // throw Exception("Error from API: ${response.data['Message']}");
+      }
+    } catch (e) {
+      String errorMessage = e.toString();
+      debugPrint("Error in getFirm: $errorMessage");
 
-    //     isLoading.value = false;
-    //     update();
-    //   } else {
-    //     throw Exception("Error from API: ${response.data['Message']}");
-    //   }
-    // } catch (e) {
-    //   String errorMessage = e.toString();
-    //   print("error $errorMessage");
+      if (errorMessage.contains("receiveTimeout") ||
+          errorMessage.contains("SocketException") ||
+          errorMessage.contains("Network Error") ||
+          errorMessage.contains("Connection failed") ||
+          errorMessage.contains("aborted") ||
+          errorMessage.contains("Failed host lookup")) {
+        checkException.value = "Network Error";
+      } else {
+        checkException.value = errorMessage;
+      }
 
-    //   if (errorMessage.contains("receiveTimeout") ||
-    //       errorMessage.contains("SocketException") ||
-    //       errorMessage.contains("Network Error") ||
-    //       errorMessage.contains("Connection failed") ||
-    //       errorMessage.contains("aborted") ||
-    //       errorMessage.contains("Failed host lookup")) {
-    //     checkException.value = "Network Error";
-    //     update();
-    //   } else {
-    //     checkException.value = errorMessage;
-    //     update();
-    //   }
-
-    //   getFlutterToast(checkException.value, Colors.red);
-    //   print("Error in getFirmData: $errorMessage");
-
-    //   throw Exception("Failed to get firm data: $errorMessage");
-    //   // checkException.value = e..toString();
-    //   // print("Error in getFirmData: $e");
-    //   //
-    //   // throw Exception("Failed to get firm data: $e");
-    // }
+      // getFlutterToast(checkException.value, Colors.red);
+      update();
+    }
   }
 
   /// Get Setting all data
   Future<void> getSettingData() async {
-    // try {
-    //   isLoading.value = true;
-    //   update();
+    try {
+      isLoading.value = true;
+      update();
 
-    //   final connectivityResult = await Connectivity().checkConnectivity();
-    //   if (connectivityResult == ConnectivityResult.none) {
-    //     hasInternet.value = false;
-    //     checkException.value = "No Internet Connection";
-    //     getFlutterToast(checkException.value, Colors.red);
-    //     return;
-    //   } else {
-    //     hasInternet.value = true;
-    //   }
+      final connectivityResult = await Connectivity().checkConnectivity();
+      if (connectivityResult == ConnectivityResult.none) {
+        hasInternet.value = false;
+        checkException.value = "No Internet Connection";
+        getFlutterToast(checkException.value, Colors.red);
+        return;
+      } else {
+        hasInternet.value = true;
+      }
 
-    //   final response = await ApiService.get(getSetting);
-    //   log("API  Setting Response: ${response.data}");
+      final response = await ApiService.get(getSetting);
+      debugPrint("API Setting Response: ${response.data}");
 
-    //   if (response.data['IsSuccess'] == true) {
-    //     String? languageName = await helper.getStoredString(
-    //       "languageNameFinal",
-    //     );
-    //     print("===========> Splash Screen Language Name ${languageName}");
-    //     SettingModel settingModel = SettingModel.fromJson(response.data);
+      if (response.data['IsSuccess'] == true) {
+        SettingModel settingModel = SettingModel.fromJson(response.data);
 
-    //     if (settingModel.data != null && settingModel.data!.isNotEmpty) {
-    //       settingList.assignAll(settingModel.data!);
-    //       SettingInfo settingInfo = settingModel.data![0];
-    //       print("==========> Setting Image ${settingInfo.referImage}");
-    //       String referMessage = await settingInfo.referMessageLocalized;
-    //       String referTitle = await settingInfo.referTitleLocalized;
-    //       await helper.storeString("savedReferMessage", referMessage);
-    //       await helper.storeString("savedReferTitle", referTitle);
-    //       savedReferMessage.value = referMessage;
-    //       savedReferTitle.value = referTitle;
-    //     } else {
-    //       log("No data in SettingModel: ${settingModel.message}");
-    //       checkException.value = "No settings data available";
-    //       getFlutterToast(checkException.value, Colors.orange);
-    //     }
-    //   } else {
-    //     checkException.value = response.data['Message'] ?? "Unknown error";
-    //     getFlutterToast(checkException.value, Colors.red);
-    //     throw Exception("Error from API: ${checkException.value}");
-    //   }
-    // } catch (e, stackTrace) {
-    //   String errorMessage = e.toString();
-    //   log("Error in getSettingData: $errorMessage, StackTrace: $stackTrace");
+        if (settingModel.data != null && settingModel.data!.isNotEmpty) {
+          settingList.assignAll(settingModel.data!);
+          SettingInfo settingInfo = settingModel.data![0];
 
-    //   if (errorMessage.contains("receiveTimeout") ||
-    //       errorMessage.contains("SocketException") ||
-    //       errorMessage.contains("Network Error") ||
-    //       errorMessage.contains("Connection failed") ||
-    //       errorMessage.contains("aborted") ||
-    //       errorMessage.contains("Failed host lookup")) {
-    //     checkException.value = "Network Error";
-    //   } else {
-    //     checkException.value = errorMessage;
-    //   }
-    //   getFlutterToast(checkException.value, Colors.red);
+          String referMessage = await settingInfo.referMessageLocalized;
+          String referTitle = await settingInfo.referTitleLocalized;
 
-    //   throw Exception("Failed to get setting data: $errorMessage");
-    // } finally {
-    //   isLoading.value = false;
-    //   update();
-    // }
+          await helper.storeString("savedReferMessage", referMessage);
+          await helper.storeString("savedReferTitle", referTitle);
+
+          savedReferMessage.value = referMessage;
+          savedReferTitle.value = referTitle;
+        } else {
+          log("No data in SettingModel: ${settingModel.message}");
+          checkException.value = "No settings data available";
+        }
+      } else {
+        checkException.value = response.data['Message'] ?? "Unknown error";
+        getFlutterToast(checkException.value, Colors.red);
+      }
+    } catch (e, stackTrace) {
+      String errorMessage = e.toString();
+      log("Error in getSettingData: $errorMessage, StackTrace: $stackTrace");
+
+      if (errorMessage.contains("receiveTimeout") ||
+          errorMessage.contains("SocketException") ||
+          errorMessage.contains("Network Error") ||
+          errorMessage.contains("Connection failed") ||
+          errorMessage.contains("aborted") ||
+          errorMessage.contains("Failed host lookup")) {
+        checkException.value = "Network Error";
+      } else {
+        checkException.value = errorMessage;
+      }
+      print("======== check Exception ${checkException.value}");
+      // getFlutterToast(checkException.value, Colors.red);
+    } finally {
+      isLoading.value = false;
+      update();
+    }
   }
 
   @override
