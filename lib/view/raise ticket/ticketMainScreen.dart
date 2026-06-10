@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:omkar_app/view/raise%20ticket/ticketMainViewScreen.dart';
+import 'package:omkar_app/controller/ticketController.dart';
 // import 'package:suratjugaad/Screens/setting_tab/ticket/create_complain_screen.dart';
 // import 'package:suratjugaad/Screens/setting_tab/ticket/ticket_view_screen.dart';
 // import 'package:suratjugaad/a_structure/constant/app_styles.dart';
@@ -14,6 +15,7 @@ class TicketMainScreen extends StatefulWidget {
   const TicketMainScreen({super.key});
 
   static Widget create() {
+    Get.put(TicketController());
     return const TicketMainScreen();
   }
 

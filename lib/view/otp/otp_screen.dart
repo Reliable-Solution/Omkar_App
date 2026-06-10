@@ -33,7 +33,7 @@ class OTPVerificationScreen extends StatefulWidget {
 }
 
 class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
-  final OTPController otpController = Get.put(OTPController());
+  final OTPController otpController = Get.put(OTPController(), permanent: true);
   final AuthController authController = Get.find();
   final RegistrationController registerController = Get.put(
     RegistrationController(),
@@ -44,6 +44,9 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
     (index) => TextEditingController(),
   );
 
+  // Add a single controller for the PinCodeTextField
+  final TextEditingController pinController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     bool isRegister = false;
@@ -51,7 +54,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
     isRegister = widget.registerPhoneNumber != "" ? true : false;
     print("OTP Screen: Is Register? $isRegister");
     return Scaffold(
-      // backgroundColor: Color(0xFFEDE7F6),
+      backgroundColor: COLOR.background,
       appBar: AppBar(
         title: Text(
           StringRes.enterVerificationCode,
@@ -91,7 +94,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
                   appContext: context,
                   length: 6,
                   cursorColor: COLOR.appBaseColor,
-                  controller: TextEditingController(),
+                  controller: pinController, // Use the persistent controller
                   onChanged: (value) {
                     if (value.length == 6) {
                       for (int i = 0; i < value.length && i < 6; i++) {
@@ -164,40 +167,65 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
                   ],
                 ),
                 SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: () {
-                    try {
-                      String otp = otpFields
-                          .map((field) => field.text.trim())
-                          .join();
+                Obx(
+                  () => ElevatedButton(
+                    // Disable button when loading
+                    onPressed: otpController.isLoading.value
+                        ? null
+                        : () {
+                            try {
+                              String otp = pinController.text.trim();
 
-                      if (otp.length == 6) {
-                        if (isRegister && widget.registerPhoneNumber != null) {
-                          otpController.verifyRegisterOtp(
-                            context,
-                            name: registerController.name.toString(),
-                            otp: otp,
-                            phoneNumber: widget.registerPhoneNumber.toString(),
-                            referCode: registerController.refer.toString(),
-                          );
-                        } else
-                          otpController.verifyLoginOtp(otp, context);
-                      } else {
-                        getFlutterToast(
-                          StringRes.phoneNumberMissing,
-                          Colors.red,
-                        );
-                      }
-                    } catch (e) {
-                      getFlutterToast(e.toString(), Colors.red);
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: COLOR.appBaseColor,
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                              if (otp.length == 6) {
+                                // Set loading to prevent multiple clicks
+                                otpController.isLoading.value = true;
+
+                                if (isRegister &&
+                                    widget.registerPhoneNumber != null) {
+                                  otpController.verifyRegisterOtp(
+                                    context,
+                                    name: registerController.name.toString(),
+                                    otp: otp,
+                                    phoneNumber: widget.registerPhoneNumber
+                                        .toString(),
+                                    referCode: registerController.refer
+                                        .toString(),
+                                  );
+                                } else {
+                                  otpController.verifyLoginOtp(otp, context);
+                                }
+                              } else {
+                                getFlutterToast(
+                                  StringRes.phoneNumberMissing,
+                                  Colors.red,
+                                );
+                              }
+                            } catch (e) {
+                              getFlutterToast(e.toString(), Colors.red);
+                            }
+                          },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: COLOR.appBaseColor,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 30,
+                        vertical: 12,
+                      ),
+                    ),
+                    child: otpController.isLoading.value
+                        ? SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : Text(
+                            StringRes.verifyOtp,
+                            style: TextStyle(color: COLOR.background),
+                          ),
                   ),
-                  child: Text(StringRes.verifyOtp),
                 ),
                 TextButton(
                   onPressed: () {

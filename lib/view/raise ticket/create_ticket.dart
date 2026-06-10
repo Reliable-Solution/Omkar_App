@@ -455,8 +455,7 @@ class CreateComplainScreen extends StatelessWidget {
                     children: [
                       _imagePicketSection(controller, context),
                       _titleDetailsSection(controller),
-
-                      // if (controller.userNameController.text.isEmpty) ...[_titleDetailsSection(controller)],
+                      _phoneDetailsSection(controller),
                       _facingSection(controller),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -591,6 +590,30 @@ class CreateComplainScreen extends StatelessWidget {
     );
   }
 
+  Widget _phoneDetailsSection(TicketController controller) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 20),
+        Padding(
+          padding: const EdgeInsets.only(left: 10, bottom: 0),
+          child: textSemiBold(text: StringRes.phoneNumber, fontSize: 16),
+        ),
+        TextFormFieldConst(
+          controller: controller.phoneController,
+          hintText: StringRes.enterYourPhoneNumber,
+          keyboardType: TextInputType.phone,
+          maxLine: 1,
+          prefixIcon: Icon(
+            Icons.phone_android,
+            color: AppStyles.primaryColor,
+            size: 20,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _facingSection(TicketController controller) {
     return Padding(
       padding: const EdgeInsets.only(left: 12.0, right: 12.0, top: 8),
@@ -650,7 +673,6 @@ class CreateComplainScreen extends StatelessWidget {
           height: size.height * 0.20,
           controller: controller.descriptionController,
           hintText: StringRes.enterDescription,
-          keyboardType: TextInputType.text,
           maxLine: 5,
           prefixIcon: Icon(
             Icons.description,

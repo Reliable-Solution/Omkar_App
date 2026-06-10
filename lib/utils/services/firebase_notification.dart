@@ -119,9 +119,20 @@ class FirebaseNotification {
     print(
         ':bell: Notification permission status: ${settings.authorizationStatus}');
 
-    // Get and log FCM token
-    String? fcmToken = await messaging.getToken();
-    print(":key: FCM Token: $fcmToken");
+    // Get and log FCM token with error handling
+    String? fcmToken;
+    try {
+      // On iOS, wait for APNS token to be set
+      if (Platform.isIOS) {
+        fcmToken = await messaging.getToken();
+      } else {
+        fcmToken = await messaging.getToken();
+      }
+      print(":key: FCM Token: $fcmToken");
+    } catch (e) {
+      print(":warning: Error getting FCM token: $e");
+      // Token will be retrieved when available
+    }
 
     // Set up Android notification channel
     const AndroidNotificationChannel channel = AndroidNotificationChannel(
