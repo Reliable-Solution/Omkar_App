@@ -4,7 +4,8 @@ import 'dart:developer' as developer;
 import '../utils/sharedPrefs.dart';
 
 final helper = SharedHelper();
-class  SettingModel {
+
+class SettingModel {
   List<SettingInfo>? data;
   bool? isSuccess;
   String? message;
@@ -65,44 +66,51 @@ class SettingInfo {
   String? settingCDT;
   Map<String, String>? referTitle;
   String? referImage;
+  String? minimumPoints;
+  String? points;
+  String? rupees;
 
-  SettingInfo(
-      {this.settingId,
-      this.settingBaseURL,
-      this.settingPhoneNumber,
-      this.settingImage,
-      this.settingCallingNumber,
-      this.settingWhatsAppNumber,
-      this.settingWhatsAppMessage,
-      this.settingTermsConditionURL,
-      this.settingPrivacyPolicyURL,
-      this.settingFaqURL,
-      this.settingHelpAndSupportURL,
-      this.settingContactUsURL,
-      this.settingsLowstock,
-      this.settingRedeemPoints,
-      this.settingEarnPointsPercentage,
-      this.settingRedeemPointsMessage,
-      this.settingCartRedeemPointsPercentage,
-      this.settingAndroidAppLink,
-      this.settingIosAppLink,
-      this.settingReferSender,
-      this.settingReferReciever,
-      this.settingReferMessage,
-      this.settingSignupBonus,
-      this.settingMaintenanceMode,
-      this.instantAPIToken,
-      this.instantAPIURL,
-      this.settingStatus,
-      this.settingCDT,
-      this.referTitle,
-      this.referImage
-      });
+  SettingInfo({
+    this.settingId,
+    this.settingBaseURL,
+    this.settingPhoneNumber,
+    this.settingImage,
+    this.settingCallingNumber,
+    this.settingWhatsAppNumber,
+    this.settingWhatsAppMessage,
+    this.settingTermsConditionURL,
+    this.settingPrivacyPolicyURL,
+    this.settingFaqURL,
+    this.settingHelpAndSupportURL,
+    this.settingContactUsURL,
+    this.settingsLowstock,
+    this.settingRedeemPoints,
+    this.settingEarnPointsPercentage,
+    this.settingRedeemPointsMessage,
+    this.settingCartRedeemPointsPercentage,
+    this.settingAndroidAppLink,
+    this.settingIosAppLink,
+    this.settingReferSender,
+    this.settingReferReciever,
+    this.settingReferMessage,
+    this.settingSignupBonus,
+    this.settingMaintenanceMode,
+    this.instantAPIToken,
+    this.instantAPIURL,
+    this.settingStatus,
+    this.settingCDT,
+    this.referTitle,
+    this.referImage,
+    this.minimumPoints,
+    this.points,
+    this.rupees,
+  });
 
   factory SettingInfo.fromJson(Map<String, dynamic> json) {
     // Helper for parsing multilingual strings to Map
     Map<String, String>? parseMultilingual(dynamic jsonValue) {
-      if (jsonValue == null || jsonValue is! String || jsonValue.isEmpty) return null;
+      if (jsonValue == null || jsonValue is! String || jsonValue.isEmpty)
+        return null;
       try {
         final decoded = jsonDecode(jsonValue) as Map<String, dynamic>;
         return decoded.map((key, value) => MapEntry(key, value as String));
@@ -111,41 +119,41 @@ class SettingInfo {
         return null;
       }
     }
-  // SettingInfo.fromJson(Map<String, dynamic> json) {
-  //   settingId = json['SettingId'];
-  //   settingBaseURL = json['SettingBaseURL'];
-  //   settingPhoneNumber = json['SettingPhoneNumber'];
-  //   settingImage = json['SettingImage'];
-  //   settingCallingNumber = json['SettingCallingNumber'];
-  //   settingWhatsAppNumber = json['SettingWhatsAppNumber'];
-  //   settingWhatsAppMessage = json['SettingWhatsAppMessage'];
-  //   settingTermsConditionURL = json['SettingTermsConditionURL'];
-  //   settingPrivacyPolicyURL = json['SettingPrivacyPolicyURL'];
-  //   settingFaqURL = json['SettingFaqURL'];
-  //   settingHelpAndSupportURL = json['SettingHelpAndSupportURL'];
-  //   settingContactUsURL = json['SettingContactUsURL'];
-  //   settingsLowstock = json['SettingsLowstock'];
-  //   settingRedeemPoints = json['SettingRedeemPoints'];
-  //   settingEarnPointsPercentage = json['SettingEarnPointsPercentage'];
-  //   settingRedeemPointsMessage = json['SettingRedeemPointsMessage'];
-  //   settingCartRedeemPointsPercentage =
-  //       json['SettingCartRedeemPointsPercentage'];
-  //   settingAndroidAppLink = json['SettingAndroidAppLink'];
-  //   settingIosAppLink = json['SettingIosAppLink'];
-  //   settingReferSender = json['SettingReferSender'];
-  //   settingReferReciever = json['SettingReferReciever'];
-  //   settingReferMessage = parseMultilingual(json['SettingReferMessage']);
-  //   // json['SettingReferMessage'];
-  //   settingSignupBonus = json['SettingSignupBonus'];
-  //   settingMaintenanceMode = json['SettingMaintenanceMode'];
-  //   instantAPIToken = json['Instant_API_token'];
-  //   instantAPIURL = json['Instant_API_URL'];
-  //   settingStatus = json['SettingStatus'];
-  //   settingCDT = json['SettingCDT'];
-  //   referTitle =parseMultilingual(json['ReferTitle']);
-  //   // json['ReferTitle'];
-  //   referImage = json['ReferImage'];
-  // }
+    // SettingInfo.fromJson(Map<String, dynamic> json) {
+    //   settingId = json['SettingId'];
+    //   settingBaseURL = json['SettingBaseURL'];
+    //   settingPhoneNumber = json['SettingPhoneNumber'];
+    //   settingImage = json['SettingImage'];
+    //   settingCallingNumber = json['SettingCallingNumber'];
+    //   settingWhatsAppNumber = json['SettingWhatsAppNumber'];
+    //   settingWhatsAppMessage = json['SettingWhatsAppMessage'];
+    //   settingTermsConditionURL = json['SettingTermsConditionURL'];
+    //   settingPrivacyPolicyURL = json['SettingPrivacyPolicyURL'];
+    //   settingFaqURL = json['SettingFaqURL'];
+    //   settingHelpAndSupportURL = json['SettingHelpAndSupportURL'];
+    //   settingContactUsURL = json['SettingContactUsURL'];
+    //   settingsLowstock = json['SettingsLowstock'];
+    //   settingRedeemPoints = json['SettingRedeemPoints'];
+    //   settingEarnPointsPercentage = json['SettingEarnPointsPercentage'];
+    //   settingRedeemPointsMessage = json['SettingRedeemPointsMessage'];
+    //   settingCartRedeemPointsPercentage =
+    //       json['SettingCartRedeemPointsPercentage'];
+    //   settingAndroidAppLink = json['SettingAndroidAppLink'];
+    //   settingIosAppLink = json['SettingIosAppLink'];
+    //   settingReferSender = json['SettingReferSender'];
+    //   settingReferReciever = json['SettingReferReciever'];
+    //   settingReferMessage = parseMultilingual(json['SettingReferMessage']);
+    //   // json['SettingReferMessage'];
+    //   settingSignupBonus = json['SettingSignupBonus'];
+    //   settingMaintenanceMode = json['SettingMaintenanceMode'];
+    //   instantAPIToken = json['Instant_API_token'];
+    //   instantAPIURL = json['Instant_API_URL'];
+    //   settingStatus = json['SettingStatus'];
+    //   settingCDT = json['SettingCDT'];
+    //   referTitle =parseMultilingual(json['ReferTitle']);
+    //   // json['ReferTitle'];
+    //   referImage = json['ReferImage'];
+    // }
 
     return SettingInfo(
       settingId: json['SettingId'] as String?,
@@ -162,9 +170,11 @@ class SettingInfo {
       settingContactUsURL: json['SettingContactUsURL'] as String?,
       settingsLowstock: json['SettingsLowstock'] as String?,
       settingRedeemPoints: json['SettingRedeemPoints'] as String?,
-      settingEarnPointsPercentage: json['SettingEarnPointsPercentage'] as String?,
+      settingEarnPointsPercentage:
+          json['SettingEarnPointsPercentage'] as String?,
       settingRedeemPointsMessage: json['SettingRedeemPointsMessage'] as String?,
-      settingCartRedeemPointsPercentage: json['SettingCartRedeemPointsPercentage'] as String?,
+      settingCartRedeemPointsPercentage:
+          json['SettingCartRedeemPointsPercentage'] as String?,
       settingAndroidAppLink: json['SettingAndroidAppLink'] as String?,
       settingIosAppLink: json['SettingIosAppLink'] as String?,
       settingReferSender: json['SettingReferSender'] as String?,
@@ -179,6 +189,9 @@ class SettingInfo {
       settingCDT: json['SettingCDT'] as String?,
       referTitle: parseMultilingual(json['ReferTitle']),
       referImage: json['ReferImage'] as String?,
+      minimumPoints: json['MinimumPoints']?.toString(),
+      points: json['Points']?.toString(),
+      rupees: json['Rupees']?.toString(),
     );
   }
   Map<String, dynamic> toJson() {
@@ -205,19 +218,25 @@ class SettingInfo {
     data['SettingIosAppLink'] = this.settingIosAppLink;
     data['SettingReferSender'] = this.settingReferSender;
     data['SettingReferReciever'] = this.settingReferReciever;
-    data['SettingReferMessage'] = settingReferMessage != null ? jsonEncode(settingReferMessage) : null;
-        // this.settingReferMessage;
+    data['SettingReferMessage'] = settingReferMessage != null
+        ? jsonEncode(settingReferMessage)
+        : null;
+    // this.settingReferMessage;
     data['SettingSignupBonus'] = this.settingSignupBonus;
     data['SettingMaintenanceMode'] = this.settingMaintenanceMode;
     data['Instant_API_token'] = this.instantAPIToken;
     data['Instant_API_URL'] = this.instantAPIURL;
     data['SettingStatus'] = this.settingStatus;
     data['SettingCDT'] = this.settingCDT;
-    data['ReferTitle'] =referTitle != null ? jsonEncode(referTitle) : null;
-        // this.referTitle;
+    data['ReferTitle'] = referTitle != null ? jsonEncode(referTitle) : null;
+    // this.referTitle;
     data['ReferImage'] = this.referImage;
+    data['MinimumPoints'] = this.minimumPoints;
+    data['Points'] = this.points;
+    data['Rupees'] = this.rupees;
     return data;
   }
+
   // Getters
   Future<String> get referMessageLocalized async {
     final language = await _getLanguage();
@@ -236,9 +255,12 @@ class SettingInfo {
 
   String _getLocalizedValue(Map<String, String>? map, String language) {
     if (map == null) return '';
-    if (language.contains('hindi') && map['hindi'] != null) return map['hindi']!;
-    if (language.contains('gujarati') && map['gujarati'] != null) return map['gujarati']!;
-    if (language.contains('marathi') && map['marathi'] != null) return map['marathi']!;
+    if (language.contains('hindi') && map['hindi'] != null)
+      return map['hindi']!;
+    if (language.contains('gujarati') && map['gujarati'] != null)
+      return map['gujarati']!;
+    if (language.contains('marathi') && map['marathi'] != null)
+      return map['marathi']!;
     return map['english'] ?? '';
   }
 }

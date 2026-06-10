@@ -78,14 +78,14 @@ class ApiService {
       // "https://keep.reliablesolution.in/Admin/Ajax/";
       // "http://192.168.1.112:8000/Admin/Ajax/";
       // "https://staging-jantunashak.reliablesolution.in/Admin/Ajax/";
-      "https://staging.ewaappliances.in//Admin/Ajax/";
+      "https://staging.ewaappliances.in/Admin/Ajax/";
 
   static final Dio _dio = Dio(
     BaseOptions(
       // baseUrl: "https://kffashionnew.reliablesolution.in/Admin/Ajax/",
       baseUrl:
           // "https://staging-jantunashak.reliablesolution.in/Admin/Ajax/",
-          "https://staging.ewaappliances.in//Admin/Ajax/",
+          "https://staging.ewaappliances.in/Admin/Ajax/",
 
       // baseUrl: "https://keep.reliablesolution.in/Admin/Ajax/",
       // baseUrl: "http://192.168.1.112:8000/Admin/Ajax/",
@@ -103,7 +103,7 @@ class ApiService {
 
       // Build cURL string
       final curl = StringBuffer();
-      curl.write("curl -X POST '$fullUrl' \\\n");
+      curl.write("curl -X GET '$fullUrl' \\\n");
 
       // Headers (add content-type for FormData)
       curl.write("  -H 'Content-Type: multipart/form-data' \\\n");
@@ -172,15 +172,10 @@ class ApiService {
       print("======== cURL Command ========");
       print(curl.toString());
       print("==============================");
-      final response = await _dio.post(
-        endpoint,
-        data: formData,
-        options: Options(
-          headers: {
-            "Cookie": 'ci_session=a4546d65e592cda9a7a377fddf8145473b17410b',
-          },
-        ),
-      );
+      final response = await _dio.post(endpoint, data: formData);
+
+      print("POST Response Body: ${response.data}");
+
       if (response.statusCode == 200) {
         return response;
       } else {

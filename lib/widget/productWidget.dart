@@ -1,23 +1,14 @@
-import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
-import 'package:omkar_app/models/productModel.dart';
-import 'package:omkar_app/utils/string_res.dart';
-import 'package:omkar_app/widget/productDetailView.dart';
-import 'package:omkar_app/widget/textWidget.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:shimmer/shimmer.dart';
 
-import '../Theme/nativeTheme.dart';
-import '../constant/app_constant.dart';
 import '../constant/colorConst.dart';
 import '../controller/homeController.dart';
 import '../controller/shareProductsController.dart';
-import '../utils/services/api_services.dart';
+import '../models/productModel.dart';
+import '../constant/app_constant.dart';
+import 'productDetailView.dart';
 
 class ProductComponent extends StatefulWidget {
   final Color color;
@@ -59,20 +50,28 @@ class _ProductComponentState extends State<ProductComponent> {
 
   @override
   Widget build(BuildContext context) {
-    double heightView = (MediaQuery.of(context).size.height * 18) / 100;
-    if (widget.products?.productId == "82") {
-      widget.products?.packInfo?.forEach((element) {
-        print(
-          "=======>>>> widget.products?.productId ${widget.products?.productId} ${element.toJson()}",
-        );
-      });
-    }
+    String? imageUrl =
+        (widget.products?.productImage != null &&
+            widget.products!.productImage!.isNotEmpty)
+        ? widget.products?.productImage
+        : (widget.products?.packInfo != null &&
+              widget.products!.packInfo!.isNotEmpty &&
+              widget.products!.packInfo![0].productdetailImages != null &&
+              widget.products!.packInfo![0].productdetailImages!.isNotEmpty)
+        ? widget.products!.packInfo![0].productdetailImages![0]
+        : null;
+
+    String? price =
+        (widget.products?.packInfo != null &&
+            widget.products!.packInfo!.isNotEmpty)
+        ? widget.products!.packInfo![0].productdetailSrp
+        : null;
 
     return InkWell(
+      borderRadius: BorderRadius.circular(16),
+      splashColor: COLOR.appBaseColor.withOpacity(0.1),
+      highlightColor: COLOR.appBaseColor.withOpacity(0.05),
       onTap: () {
-        print(
-          "=====>>> Product Tap ${widget.products?.productId} ${widget.products?.productName}",
-        );
         Get.to(
           () => ProductDetailScreen(
             products: widget.products!,
@@ -82,120 +81,104 @@ class _ProductComponentState extends State<ProductComponent> {
           transition: Transition.rightToLeftWithFade,
         );
       },
-      child: SizedBox(
-        width: widget.fromVideoScreen
-            ? MediaQuery.sizeOf(context).width * 0.4
-            : null,
+      child: Container(
+        height: 400,
+        margin: const EdgeInsets.symmetric(vertical: 3),
+        // padding: const EdgeInsets.symmetric(horizontal: 4),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade100.withOpacity(0.9),
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            // Deep 3D-style shadow
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              // blurRadius: 15,
+              offset: const Offset(0, 8),
+              spreadRadius: -4,
+            ),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 6,
+              offset: const Offset(0, 4),
+              spreadRadius: -1,
+            ),
+          ],
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min, // Added for tighter fit
           children: [
-            // IMAGE
+            // Image Section
             AspectRatio(
-              aspectRatio: 4 / 4,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(6),
+              aspectRatio: 0.89,
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    // Deep 3D-style shadow
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.06),
+                      blurRadius: 15,
+                      offset: const Offset(0, 8),
+                      spreadRadius: -2,
+                    ),
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.04),
+                      blurRadius: 6,
+                      offset: const Offset(0, 4),
+                      spreadRadius: -1,
+                    ),
+                  ],
+                ),
                 child: Stack(
                   children: [
-                    // IMAGE
-                    Positioned.fill(
-                      child:
-                          widget.products?.productImage?.isNotEmpty == true &&
-                              widget.products!.productImage?.isNotEmpty == true
-                          ? CachedNetworkImage(
-                              imageUrl:
-                                  '$IMAGE_URL${widget.products?.productImage}',
-                              fit: BoxFit.cover,
-                              placeholder: (_, __) =>
-                                  Container(color: Colors.grey.shade200),
-                              errorWidget: (_, __, ___) => Container(
-                                color: Colors.grey.shade200,
-                                child: Opacity(
-                                  opacity:
-                                      0.8, // 0.0 = fully transparent, 1.0 = fully visible
-                                  child: Image.asset(
-                                    'assets/images/logo.png',
-                                    width: 100,
-                                    height: 100,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Icon(
-                                        Icons.image_not_supported,
-                                        color: Colors.grey,
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                            )
-                          : widget.products?.productImage != null
-                          ? CachedNetworkImage(
-                              imageUrl:
-                                  '$IMAGE_URL${widget.products!.productImage!}',
-                              fit: BoxFit.cover,
-                              placeholder: (_, __) =>
-                                  Container(color: Colors.grey.shade200),
-                              errorWidget: (_, __, ___) => Container(
-                                color: Colors.grey.shade200,
-                                child: Opacity(
-                                  opacity: 0.8,
-                                  child: Image.asset(
-                                    'assets/images/logo.png',
-                                    width: 100,
-                                    height: 100,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Icon(
-                                        Icons.image_not_supported,
-                                        color: Colors.grey,
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                            )
-                          : Opacity(
-                              opacity:
-                                  0.8, // 0.0 = fully transparent, 1.0 = fully visible
-                              child: Image.asset(
-                                'assets/images/logo.png',
-                                width: 100,
-                                height: 100,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Icon(
-                                    Icons.image_not_supported,
-                                    color: Colors.grey,
-                                  );
-                                },
-                              ),
-                            ),
-                    ),
-
-                    // BLACK GRADIENT (bottom fade)
-                    Positioned.fill(
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
                       child: Container(
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [Colors.transparent, Colors.black54],
-                          ),
-                        ),
+                        width: double.infinity,
+                        color: Colors.white,
+                        child: imageUrl != null && imageUrl.isNotEmpty
+                            ? CachedNetworkImage(
+                                imageUrl: '$IMAGE_URL$imageUrl',
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) =>
+                                    Shimmer.fromColors(
+                                      baseColor: Colors.grey[200]!,
+                                      highlightColor: Colors.grey[100]!,
+                                      child: Container(color: Colors.white),
+                                    ),
+                                errorWidget: (context, url, error) =>
+                                    Image.asset(
+                                      'assets/images/logo.png',
+                                      scale: 4,
+                                    ),
+                              )
+                            : Image.asset('assets/images/logo.png', scale: 4),
                       ),
                     ),
-
-                    // TEXT (bottom center)
+                    // Add Icon Button (Premium Style)
                     Positioned(
-                      left: 8,
-                      right: 8,
-                      bottom: 8,
-                      child: Text(
-                        widget.products!.productName ?? '',
-                        maxLines: 2,
-                        textAlign: TextAlign.center,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                      bottom: 10,
+                      right: 10,
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: COLOR.appBaseColor,
+                          shape: BoxShape.rectangle,
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: COLOR.appBaseColor.withOpacity(0.3),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.arrow_forward,
+                          size: 18,
                           color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          height: 1.2,
                         ),
                       ),
                     ),
@@ -203,21 +186,42 @@ class _ProductComponentState extends State<ProductComponent> {
                 ),
               ),
             ),
-
-            // const SizedBox(height: 8),
-
-            // // TITLE
-            // Text(
-            //   widget.products!.productName ?? '',
-            //   maxLines: 2,
-            //   overflow: TextOverflow.ellipsis,
-            //   style: TextStyle(
-            //     fontSize: 14,
-            //     fontWeight: FontWeight.w600,
-            //     height: 1.3,
-            //     color: Colors.black87,
-            //   ),
-            // ),
+            const SizedBox(height: 06),
+            // Product Details
+            Expanded(
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 05),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      widget.products?.productName ?? '',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black87,
+                        height: 1.2,
+                      ),
+                    ),
+                  // Text(
+                  //   price != null ? "₹ $price" : '',
+                  //   maxLines: 1,
+                  //   overflow: TextOverflow.ellipsis,
+                  //   style: const TextStyle(
+                  //     fontSize: 15,
+                  //     fontWeight: FontWeight.bold,
+                  //     color: Colors.black,
+                  //   ),
+                  // ),
+                ],
+              ),
+                            ),
+            ),
+            const SizedBox(height: 06),
           ],
         ),
       ),

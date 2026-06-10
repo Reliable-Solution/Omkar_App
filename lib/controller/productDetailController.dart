@@ -1,4 +1,5 @@
-//packages
+import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../constant/api_endpoints.dart';
 import '../constant/app_constant.dart';
@@ -66,8 +67,11 @@ class ProductDetailsController extends GetxController
     update(); // UI refresh
   }
 
-  Future<void> addToCart(ProductModel productModel, String productDetailId,
-      {bool isFromBuy = false}) async {
+  Future<void> addToCart(
+    ProductModel productModel,
+    String productDetailId, {
+    bool isFromBuy = false,
+  }) async {
     try {
       if (!isFromBuy) isLoader.value = true;
       update();
@@ -78,20 +82,17 @@ class ProductDetailsController extends GetxController
         'ProductdetailId':
             productDetailId ?? productModel.packInfo![0].productdetailId,
         'CartQuantity': "1",
-        'FirmId': firmId
+        'FirmId': firmId,
       };
 
-      var response = await ApiService.post(
-        endpoint: addToCartApi,
-        body: body,
-      );
+      var response = await ApiService.post(endpoint: addToCartApi, body: body);
 
       if (response.data['IsSuccess'] == true) {
         print("Add To Cart API Response: ${response.data}");
 
         // Get.find<CartController>().cartList.add(CartDetailModel.fromJson(response.data['Data']));
         //
-        // ✅ **Cart total aur UI update karo**
+        //  **Cart total aur UI update karo**
         Get.find<CartController>().getCartDetails(
           Get.find<CartController>().customerModel!.value.customerId!,
         );
@@ -112,6 +113,47 @@ class ProductDetailsController extends GetxController
     } catch (e) {
       print("Error in add to cart: $e");
       throw Exception("Failed to add to cart: $e");
+    }
+  }
+
+  RxBool isInquiryLoading = false.obs;
+
+  Future<void> submitInquiry(String description) async {
+    try {
+      isInquiryLoading.value = true;
+      update();
+
+      final Map<String, dynamic> body = {
+        'CustomerId': customerModel!.value.customerId,
+        'InquiryDesc': description,
+      };
+
+      var response = await ApiService.post(endpoint: addInquiry, body: body);
+      print("Inquiry API Response: ${response.data}");
+
+      // String response ko Map mein convert kar rahe hain agar zaroorat ho
+      var res = response.data is String
+          ? jsonDecode(response.data)
+          : response.data;
+
+      if (res['IsSuccess'] == true) {
+        Get.back(); // PopUp bandh ho jayega
+        getFlutterToast(
+          res['Message'] ?? "Inquiry submitted successfully",
+          Colors.green,
+        );
+      } else {
+        getFlutterToast(
+          res['Message'] ?? "Failed to submit inquiry",
+          Colors.red,
+        );
+      }
+    } catch (e) {
+      print("Error in submitInquiry: $e");
+      // getFlutterToast("Failed to submit inquiry: $e", Colors.red);
+    } finally {
+      isInquiryLoading.value = false;
+      update();
     }
   }
 

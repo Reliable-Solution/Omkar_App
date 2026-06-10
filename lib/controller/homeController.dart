@@ -111,6 +111,7 @@ class HomeController extends GetxController
         await editProfileController.GetProfile(
           customerId: m1?.customerId.toString() ?? "",
         );
+        await getPrefs(); // Reload local model to reflect profile changes
       }
 
       // await getDashboardData(m1?.customerId);
@@ -183,12 +184,28 @@ class HomeController extends GetxController
     CustomerModel? customer = await helper.getCustomer();
     if (customer != null) {
       customerModel!.value = customer;
-      debugPrint("✅ Name: ${customer.customerName}");
-      debugPrint("=========> ✅ Name and Points: ${customer.points}");
+      m1 = customer; // Update m1 as well
+      debugPrint(" Name: ${customer.customerName}");
+      debugPrint("=========> Name and Points: ${customer.points}");
       debugPrint("Controller hash in HomeController: $hashCode");
       debugPrint("Updated Name: ${customer.customerName}");
       update(); // agar tu GetBuilder bhi use kar raha hai
     }
+  }
+
+  // Added Method to clear data on Logout
+  void clearData() {
+    customerModel?.value = CustomerModel();
+    m1 = CustomerModel();
+    categoryList.clear();
+    offerList.clear();
+    brandList.clear();
+    productList.clear();
+    searchList.clear();
+    blogList.clear();
+    educationList.clear();
+    update();
+    debugPrint("HomeController Data Cleared");
   }
 
   List<String> filters = [
@@ -220,6 +237,7 @@ class HomeController extends GetxController
     productList.clear();
 
     isDashBoardLoading.value = true;
+    update(); // Trigger UI update to show Shimmer
 
     String? languageName = await helper.getStoredString("languageNameFinal");
     debugPrint("=========> Language Name HomeScreen $languageName");
@@ -248,20 +266,20 @@ class HomeController extends GetxController
 
         // Parse Offer from data[0]
         if (data.isNotEmpty && data[0]['Offer'] != null) {
-          debugPrint("✅ Found Offers in data[0]");
+          debugPrint(" Found Offers in data[0]");
           offerList = (data[0]['Offer'] as List? ?? [])
               .map((offerJson) => OfferModel.fromJson(offerJson))
               .toList();
-          debugPrint("✅ Offer Count: ${offerList.length}");
+          debugPrint("Offer Count: ${offerList.length}");
         }
 
         // Parse Products from data[1]
         if (data.length > 1 && data[1]['Product'] != null) {
-          debugPrint("✅ Found Products in data[1]");
+          debugPrint(" Found Products in data[1]");
           productList = (data[1]['Product'] as List? ?? [])
               .map((productJson) => ProductModel.fromJson(productJson))
               .toList();
-          debugPrint("✅ Product Count: ${productList.length}");
+          debugPrint(" Product Count: ${productList.length}");
         }
 
         isDashBoardLoading.value = false;
@@ -379,7 +397,7 @@ class HomeController extends GetxController
       debugPrint("Search blogs error: $e");
       searchBlogs.clear();
     } finally {
-      isBlogSearching.value = false; // 🔥 Stop loader
+      isBlogSearching.value = false; //  Stop loader
     }
   }
 

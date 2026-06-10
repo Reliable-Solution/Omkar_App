@@ -107,7 +107,7 @@ Widget orderTracking(BuildContext context) {
       : SizedBox();
 }
 
-// ✅ Tracking Step Widget
+// Tracking Step Widget
 Widget trackingStep(String title, String date, bool completed) {
   OrderController orderController = Get.find();
 
@@ -126,7 +126,7 @@ Widget trackingStep(String title, String date, bool completed) {
       : SizedBox();
 }
 
-// ✅ Cancel Order Button
+// Cancel Order Button
 Widget cancelOrderButton(BuildContext context) {
   OrderController orderController = Get.find();
   final orderStatus =
@@ -305,7 +305,7 @@ Widget cancelOrderButton(BuildContext context) {
       : SizedBox();
 }
 
-// ✅ Delivery Address Widget
+//  Delivery Address Widget
 Widget deliveryAddress(BuildContext context) {
   OrderController orderController = Get.find();
 
@@ -338,7 +338,7 @@ Widget deliveryAddress(BuildContext context) {
   );
 }
 
-// ✅ Recently Viewed Items
+//  Recently Viewed Items
 Widget recentlyViewed() {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -356,7 +356,7 @@ Widget recentlyViewed() {
   );
 }
 
-// ✅ Recently Viewed Item
+// Recently Viewed Item
 Widget recentlyViewedItem() {
   return Container(
     margin: EdgeInsets.only(right: 10),
@@ -374,7 +374,7 @@ Widget recentlyViewedItem() {
   );
 }
 
-// ✅ Payment Details
+//  Payment Details
 Widget paymentDetails(BuildContext context) {
   OrderController orderController = Get.find();
 
@@ -493,7 +493,7 @@ Widget paymentDetails(BuildContext context) {
   );
 }
 
-// ✅ Order Summary Component
+//  Order Summary Component
 class OrderSummary extends StatelessWidget {
   final List<OrderDetailData> ordersDetailsList;
 

@@ -4,14 +4,14 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LanguageController extends GetxController {
-  RxString selectedLanguage = "ગુજરાતી".obs;
-  var currentLocale = Locale('gu', 'IN').obs; // ✅ Default Locale
-  RxString languageName = "gu".obs;
+  RxString selectedLanguage = "English".obs;
+  var currentLocale = Locale('en', 'US').obs; //  Default Locale
+  RxString languageName = "en".obs;
 
   final List<Map<String, String>> languages = [
     {"name": "English", "symbol": "🇺🇸", "code": "en", "country": "US"},
-    {"name": "हिंदी", "symbol": "🇮🇳", "code": "hi", "country": "IN"},
-    {"name": "ગુજરાતી", "symbol": "🇮🇳", "code": "gu", "country": "IN"},
+    // {"name": "हिंदी", "symbol": "🇮🇳", "code": "hi", "country": "IN"},
+    // {"name": "ગુજરાતી", "symbol": "🇮🇳", "code": "gu", "country": "IN"},
     // {"symbol": "અ", "name": "Gujarati"},
     // {"symbol": "अ", "name": "Hindi"},
     // {"symbol": "A", "name": "English"},
@@ -32,25 +32,27 @@ class LanguageController extends GetxController {
 
   Future<void> loadLanguage() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? langCode = prefs.getString("language") ?? "gu";
-    selectedLanguage.value = prefs.getString("languageName") ?? "ગુજરાતી";
+    String? langCode = prefs.getString("language") ?? "en";
+    selectedLanguage.value = prefs.getString("languageName") ?? "English";
     print(" Loaded Language: $langCode");
     languageName.value = langCode;
 
-    var locale = Locale(langCode,
-        languages.firstWhere((e) => e["code"] == langCode)["country"]!);
+    var locale = Locale(
+      langCode,
+      languages.firstWhere((e) => e["code"] == langCode)["country"]!,
+    );
     currentLocale.value = locale;
     print("Loacale Data ${locale.countryCode}");
     Get.updateLocale(locale);
   }
 
-  Future<void>  changeLanguage(String name) async {
+  Future<void> changeLanguage(String name) async {
     var lang = languages.firstWhere((element) => element["name"] == name);
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString("language", lang["code"]!);
     await prefs.setString("languageName", lang["name"]!);
-    selectedLanguage.value = lang["name"]!; // ✅ Fix: Update selectedLanguage
+    selectedLanguage.value = lang["name"]!; //  Fix: Update selectedLanguage
 
     var locale = Locale(lang["code"]!, lang["country"]!);
     currentLocale.value = locale; //  Obx UI Update Karega
@@ -74,8 +76,9 @@ class LanguageController extends GetxController {
 
   Locale getLocale() {
     var lang = languages.firstWhere(
-        (element) => element["name"] == selectedLanguage.value,
-        orElse: () => languages[0]);
+      (element) => element["name"] == selectedLanguage.value,
+      orElse: () => languages[0],
+    );
     return Locale(lang["code"]!, lang["country"]!);
   }
 }
