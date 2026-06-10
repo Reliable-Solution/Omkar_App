@@ -621,6 +621,15 @@ class _PrimaryScreenState extends State<PrimaryScreen> {
                     // _controller.m1!.value!.customerPhoneNo!
                     _controller.cPhoneNo.text,
                   ),
+                  // Role field (read-only)
+                  const SizedBox(height: 15),
+                  Obx(
+                    () => _buildInfoRow(
+                      context,
+                      "Role",
+                      _controller.m1?.value?.role ?? "N/A",
+                    ),
+                  ),
                   Padding(
                     padding: const EdgeInsets.only(top: 15),
                     child: SizedBox(

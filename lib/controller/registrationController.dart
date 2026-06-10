@@ -1,369 +1,130 @@
-import 'dart:convert';
-
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:omkar_app/constant/api_endpoints.dart';
 import 'package:omkar_app/constant/app_constant.dart';
-import 'package:omkar_app/models/customerModel.dart';
-import 'package:omkar_app/view/dashboard/dashboardScreen.dart';
-import 'package:omkar_app/controller/otpController.dart';
-import '../utils/services/api_services.dart';
 import '../utils/sharedPrefs.dart';
-import 'package:omkar_app/utils/services/firebase_authenticate.dart';
-import 'package:omkar_app/view/otp/otp_screen.dart';
-import 'package:sms_autofill/sms_autofill.dart';
-
-import '../view/otp/phone_auth.dart';
 import 'authController.dart';
 import 'homeController.dart';
 
 class RegistrationController extends GetxController {
+  // Observables for data persistence across views
   final name = ''.obs;
   final email = ''.obs;
   final refer = ''.obs;
+  final phoneNumber = ''.obs;
+  // Controllers for UI input
+  final nameController = TextEditingController();
+  final phoneController = TextEditingController();
+  final referController = TextEditingController();
 
-  var phoneNumber = ''.obs;
-  final isNameValid = false.obs;
-  final isReferValid = false.obs;
-  final isEmailValid = false.obs;
   final isPhoneNumberValid = false.obs;
-  SharedHelper helper = SharedHelper();
-  FirebaseAuthenticate firebaseAuthenticate = FirebaseAuthenticate();
-  final AuthController authController = Get.put(
-    AuthController(),
-  ); // Shared Firebase
-  var otpCode = "".obs;
-  final phoneController = "".obs;
   var isLoading = false.obs;
 
-  final HomeController homeController = Get.find<HomeController>();
+  late final AuthController authController;
+  late final HomeController homeController;
+  SharedHelper helper = SharedHelper();
 
   @override
   void onInit() {
-    // TODO: implement onInit
     super.onInit();
-    // getHintNumber();
-  }
-
-  /// Fetch mobile number hint with error handling
-  Future<void> getHintNumber() async {
-    try {
-      String? phone = await SmsAutoFill().hint;
-      if (phone != null) {
-        phone = phone.replaceAll("+91", "").trim();
-        phoneController.value = phone;
-        print("============ ${phone}");
-        phoneNumber.value = phone;
-
-        update();
-      }
-    } catch (e) {
-      print("Error : Failed to fetch mobile number: $e");
-    }
-  }
-
-  /// Navigate to OTP Screen
-  void sendOTP() {
-    try {
-      if (phoneNumber.value.length < 10) {
-        throw "Invalid phone number";
-      }
-      // Get.to(OTPVerificationScreen(
-      //   registerPhoneNumber: phoneNumber.value,
-      // ));
-    } catch (e) {
-      getFlutterToast(e.toString(), Colors.red);
-    }
-  }
-
-  void setName(String value) {
-    name.value = value;
-    isNameValid.value = value.isNotEmpty && value.length >= 3;
-  }
-
-  void setRefer(String value) {
-    refer.value = value;
-    isReferValid.value = value.isNotEmpty && value.length >= 3;
-  }
-
-  void setEmail(String value) {
-    email.value = value;
-    isEmailValid.value = RegExp(
-      r'^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$',
-    ).hasMatch(value);
+    // Find existing AuthController instead of creating new one
+    authController = Get.find<AuthController>();
+    // Find HomeController lazily
+    homeController = Get.find<HomeController>();
+    // Sync controllers with observables if needed
+    nameController.addListener(() => name.value = nameController.text);
+    phoneController.addListener(() => phoneNumber.value = phoneController.text);
+    referController.addListener(() => refer.value = referController.text);
   }
 
   void setPhoneNumber(String value) {
+    phoneController.text = value;
     phoneNumber.value = value;
-    isPhoneNumberValid.value = value.length == 10;
     isPhoneNumberValid.value = value.length == 10;
     update();
   }
 
-  // void submitRegistration() {
-  //   if (name.value.isNotEmpty && phoneNumber.value.isNotEmpty) {
-  //     // getToken();
-  //     getTokenAndSendOTP();
-  //   } else {
-  //     getFlutterToast("Please fill in all fields correctly.", Colors.red);
-  //     update();
-  //   }
-  //   getTokenAndSendOTP();
-  //   update();
-  // }
+  void setName(String value) {
+    nameController.text = value;
+    name.value = value;
+  }
+
+  void setRefer(String value) {
+    referController.text = value;
+    refer.value = value;
+  }
 
   void submitRegistration() async {
-    if (name.value.isNotEmpty && phoneNumber.isNotEmpty) {
+    String nameVal = nameController.text.trim();
+    String phoneVal = phoneController.text.trim();
+    String referVal = referController.text.trim();
+
+    if (nameVal.isNotEmpty && phoneVal.length == 10) {
+      await helper.deleteCustomer(); // Clear any previous session to prevent bypass
       isLoading.value = true;
       update();
 
       try {
-        authController.setRegisterFlow(true);
-        FirebaseMessaging messaging = FirebaseMessaging.instance;
-        NotificationSettings settings = await messaging.requestPermission(
-          alert: true,
-          badge: true,
-          sound: true,
+        debugPrint(
+          "🚀 [RegistrationController] Starting registration for $phoneVal",
         );
 
-        if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-          String? token = await messaging.getToken();
-          if (token != null) {
-            authController.tokenGet.value = token;
-            authController.setPhoneNumber(phoneNumber.value);
+        // Update observables for late use in OTP screen
+        name.value = nameVal;
+        phoneNumber.value = phoneVal;
+        refer.value = referVal;
 
-            // Navigate to OTP screen with all registration details
-            print(
-              "======> Registering user with name: ${name.value}"
-              "======> Registering user with email: ${email.value}"
-              "======> Registering user with refer: ${refer.value}",
+        authController.setRegisterFlow(true);
+        authController.setIsFromRegistration(true);
+        authController.setPhoneNumber(phoneVal);
+
+        // Non-blocking FCM token retrieval
+        try {
+          FirebaseMessaging messaging = FirebaseMessaging.instance;
+          NotificationSettings settings = await messaging
+              .requestPermission(alert: true, badge: true, sound: true)
+              .timeout(const Duration(seconds: 5));
+
+          if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+            String? token = await messaging.getToken().timeout(
+              const Duration(seconds: 5),
             );
-            Get.to(
-              () => OTPVerificationScreen(
-                phoneNumber: phoneNumber.value,
-                registerPhoneNumber: phoneNumber.value,
-                name: name.value,
-                // email: email.value,
-                referCode: refer.value,
-              ),
-            );
-
-            // Start OTP timer
-            OTPController otpController = Get.put(OTPController());
-            otpController.startTimer();
-
-            // Send OTP
-            await authController.sendFirebaseOTP(Get.context!);
+            if (token != null) {
+              authController.tokenGet.value = token;
+              debugPrint(
+                "📲 [RegistrationController] FCM Token obtained: $token",
+              );
+            }
           }
+        } catch (fcmError) {
+          debugPrint(
+            " [RegistrationController] FCM Token error (continuing anyway): $fcmError",
+          );
         }
+
+        // Send OTP (authController handles the navigation to OTP screen in its codeSent callback)
+        await authController.sendFirebaseOTP(Get.context!);
       } catch (e) {
-        getFlutterToast("Error: $e", Colors.red);
+        debugPrint(" [RegistrationController] Error in submitRegistration: $e");
+        getFlutterToast("Registration error: $e", Colors.red);
       } finally {
         isLoading.value = false;
         update();
       }
     } else {
-      getFlutterToast("Fill details correctly.", Colors.red);
+      if (nameVal.isEmpty) {
+        getFlutterToast("Please enter your name.", Colors.red);
+      } else if (phoneVal.length != 10) {
+        getFlutterToast("Enter a valid 10-digit number.", Colors.red);
+      }
     }
   }
 
-  void getToken() async {
-    FirebaseMessaging messaging = FirebaseMessaging.instance;
-    isLoading.value = true;
-
-    NotificationSettings settings = await messaging.requestPermission(
-      alert: true,
-      announcement: false,
-      badge: true,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
-      sound: true,
-    );
-
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      print('User granted permission');
-      String? token = await messaging.getToken();
-      // registerUser(context,token!);
-      print('FCM Token: $token');
-    } else {
-      print('User declined or has not accepted permission');
-    }
-    isLoading.value = false;
-  }
-
-  registerUser(BuildContext context, String token) async {
-    try {
-      final Map<String, dynamic> body = {
-        'CustomerName': name.value.toString(),
-        'CustomerEmailId': "",
-        'CustomerPhoneNo': phoneNumber.value.toString(),
-        'CustomerFCMToken': token,
-        'ReferCode': refer.value.toString(),
-        'FirmId': firmId,
-      };
-
-      print("Request Body: $body");
-
-      var response = await ApiService.post(
-        endpoint: newAddCustomer,
-        body: body,
-      );
-      print("Response Data: ${response.data.runtimeType}");
-      // print("======== Response Data: ${response.data['IsSuccess']}")z;
-      // print("Response Data message: ${response.data['Message']}");
-
-      var res;
-      if (response.data is String) {
-        res = jsonDecode(response.data);
-      } else {
-        res = response.data;
-      }
-      print("=========== responces Data ${res}");
-      if (res['IsSuccess'] == true) {
-        var data = res["Data"];
-
-        if (data is List && data.isNotEmpty) {
-          sendOTPPhone(context, phoneNumber.value);
-          // Get.to(() => OTPVerificationScreen(registerPhoneNumber: phoneNumber.value));
-        } else if (data == 0) {
-          getFlutterToast(
-            "You already have an account. Please sign in.",
-            Colors.red,
-          );
-          Get.offAll(() => LoginScreen());
-        } else {
-          getFlutterToast(
-            "Registration successful, but no data received.",
-            Colors.red,
-          );
-        }
-        // CustomerModel customerModel =
-        //     CustomerModel.fromJson(response.data["Data"][0]);
-        //
-        // print("Customer Name: ${customerModel.customerName}");
-        //
-        // helper.setCustomer(customerModel);
-        // Get.to(() =>
-        //     OTPVerificationScreen(registerPhoneNumber: phoneNumber.value));
-
-        // Get.offAll(() => DashboardScreen(pageIndex: 0));
-        update();
-      }
-      // else if (response.data['Message'] == "Customer Already Register") {
-      //   Get.offAll(() => LoginScreen());
-      // }
-      else {
-        getFlutterToast(response.data['Message'], Colors.red);
-      }
-    } catch (e) {
-      print("Error in register: $e");
-      getFlutterToast("Failed to register. Please try again.'", Colors.red);
-      throw Exception("Failed to register");
-    }
-  }
-
-  Future<void> sendOTPPhone(BuildContext context, String phoneNumber) async {
-    try {
-      isLoading.value = true; // Loader start
-
-      if (phoneNumber.isEmpty || phoneNumber.length < 10) {
-        snackBarMessengers(
-          context,
-          message: "Please enter a valid phone number.",
-        );
-        return;
-      }
-      // Request body
-      final Map<String, dynamic> body = {
-        "dial_code": "91",
-        "phone": phoneNumber.toString(),
-      };
-      print('Request Body Phone Number : $body');
-
-      // Dio POST call
-      var response = await ApiService.post(endpoint: SendOtp, body: body);
-      if (response.data['IsSuccess'] == true) {
-        getFlutterToast("OTP sent to your mobile.", Colors.green);
-        Get.to(() => OTPVerificationScreen(phoneNumber: phoneNumber));
-        isLoading.value = false;
-        update();
-      } else {
-        getFlutterToast(response.data['Message'], Colors.red);
-      }
-    } catch (e) {
-      isLoading.value = false;
-      print("Error in sendOtp: $e");
-      getFlutterToast("Something went wrong. Please try again.", Colors.red);
-    }
-  }
-
-  // Get token and send Firebase OTP
-  void getTokenAndSendOTP() async {
-    isLoading.value = true;
-    update();
-
-    FirebaseMessaging messaging = FirebaseMessaging.instance;
-    NotificationSettings settings = await messaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
-
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      String? token = await messaging.getToken();
-      if (token != null) {
-        authController.tokenGet.value = token; // Shared token
-        authController.setPhoneNumber(phoneNumber.value); // Shared phone
-        await authController.sendFirebaseOTP(Get.context!); // Firebase OTP send
-      }
-    }
-    isLoading.value = false;
-    update();
-  }
-
-  snackBarMessengers(context, {message, color, isDuration = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      isDuration
-          ? SnackBar(
-              duration: const Duration(milliseconds: 500),
-              content: Container(
-                padding: const EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                  color: color ?? Colors.red,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  message.toString(),
-                  // style: appCss.dmDenseMedium16
-                  //     .textColor(appColor(context).whiteBg)
-                ),
-              ),
-              backgroundColor: Colors.transparent,
-              behavior: SnackBarBehavior.floating,
-              elevation: 0,
-              padding: EdgeInsets.zero,
-            )
-          : SnackBar(
-              content: Container(
-                padding: const EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                  color: color ?? Colors.red,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  message.toString(),
-                  // style: appCss.dmDenseMedium16
-                  //     .textColor(Colors.white)
-                ),
-              ),
-              backgroundColor: Colors.transparent,
-              behavior: SnackBarBehavior.floating,
-              elevation: 0,
-              padding: EdgeInsets.zero,
-            ),
-    );
+  @override
+  void onClose() {
+    nameController.dispose();
+    phoneController.dispose();
+    referController.dispose();
+    super.onClose();
   }
 }

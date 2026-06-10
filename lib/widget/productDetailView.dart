@@ -162,6 +162,66 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     cartController.update();
   }
 
+  void _showInquiryPopup(BuildContext context) {
+    TextEditingController inquiryDescController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          "Inquiry Description",
+          style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
+        content: TextField(
+          controller: inquiryDescController,
+          maxLines: 4,
+          decoration: InputDecoration(
+            hintText: "Enter your inquiry here...",
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+          style: GoogleFonts.poppins(fontSize: 14),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              "Cancel",
+              style: GoogleFonts.poppins(color: Colors.grey),
+            ),
+          ),
+          Obx(() {
+            return productDetailsController.isInquiryLoading.value
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : ElevatedButton(
+                    onPressed: () {
+                      if (inquiryDescController.text.trim().isEmpty) {
+                        Fluttertoast.showToast(msg: "Please enter description");
+                        return;
+                      }
+                      productDetailsController.submitInquiry(
+                        inquiryDescController.text.trim(),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: COLOR.appBaseColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: Text(
+                      "Submit",
+                      style: GoogleFonts.poppins(color: Colors.white),
+                    ),
+                  );
+          }),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     for (var element in productListOFPackInfo) {
@@ -775,65 +835,54 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ],
                   ),
                 ),
-                // bottomNavigationBar: GetBuilder<ProductDetailsController>(
-                //   builder: (productDetailsController) {
-                //     final productDetailId = isNewPack
-                //         ? packInfoOfSelected!.productdetailId!
-                //         : productListOFPackInfo[0].productdetailId!;
-                //     final isInCart = isProductInCart(productDetailId);
-
-                //     return IntrinsicHeight(
-                //       child: ColoredBox(
-                //         color: Colors.white,
-                //         child: Row(
-                //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //           children: [
-                //             Expanded(
-                //               child: Container(
-                //                 height: 55,
-                //                 decoration: BoxDecoration(color: COLOR.green50),
-                //                 child: productDetailsController.isLoader.value
-                //                     ? Center(
-                //                         child: CircularProgressIndicator(
-                //                           valueColor: AlwaysStoppedAnimation<Color>(
-                //                             COLOR.appBaseColor,
-                //                           ),
-                //                         ),
-                //                       )
-                //                     : _buildAddToCartButton(
-                //                         context,
-                //                         productDetailsController,
-                //                         isInCart,
-                //                         productDetailId,
-                //                       ),
-                //               ),
-                //             ),
-                //             Expanded(
-                //               child: _isBuyToCart
-                //                   ? Center(
-                //                       child: CircularProgressIndicator(
-                //                         valueColor: AlwaysStoppedAnimation<Color>(
-                //                           COLOR.appBaseColor,
-                //                         ),
-                //                       ),
-                //                     )
-                //                   : _buildBuyNowButton(
-                //                       context,
-                //                       productDetailsController,
-                //                       isInCart,
-                //                       productDetailId,
-                //                     ),
-                //             ),
-                //           ],
-                //         ),
-                //       ),
-                //     );
-                //   },
-                // ),
               ),
             ],
           ),
         ),
+        bottomNavigationBar: productDetailsController.customerModel?.value.role
+                    ?.toLowerCase() ==
+                'customer'
+            ? Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, -5),
+                    ),
+                  ],
+                ),
+                child: ElevatedButton(
+                  onPressed: () => _showInquiryPopup(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: COLOR.appBaseColor,
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.info_outline, color: Colors.white),
+                      const SizedBox(width: 8),
+                      Text(
+                        "ADD INQUIRY",
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            : const SizedBox.shrink(),
       ),
     );
   }

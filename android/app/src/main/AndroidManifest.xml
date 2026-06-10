@@ -30,11 +30,11 @@
     </queries>
 
     <application
-        android:label="Omkar"
+        android:label="Ewa Appliances"
         android:name="${applicationName}"
         android:allowBackup="false"
         android:fullBackupContent="false"
-        android:icon="@mipmap/launcher_icon">
+        android:icon="@mipmap/ic_launcher">
 
         <activity
             android:name=".MainActivity"
@@ -100,7 +100,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="jantunashak" android:host="product" />
+                <data android:scheme="ewaappliances" android:host="product" />
             </intent-filter>
 
 
@@ -108,7 +108,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="jantunashak" />
+                <data android:scheme="ewaappliances" />
                 <data android:pathPrefix="/product/" />
             </intent-filter>
 
