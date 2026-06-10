@@ -26,13 +26,13 @@ class LocalizationService extends Translations {
       translations['en'] = Map<String, String>.from(json.decode(enJson));
       translations['hi'] = Map<String, String>.from(json.decode(hiJson));
       translations['gu'] = Map<String, String>.from(json.decode(guJson));
-      print("🌍 Translations Loaded Successfully");
+      print(" Translations Loaded Successfully");
     } catch (e) {
-      print("❌ Error Loading Translations: $e");
+      print(" Error Loading Translations: $e");
     }
   }
 
-  /// ✅ **Language Change Function**
+  ///  **Language Change Function**
   static void changeLocale(String langCode) {
     Locale locale = locales.firstWhere(
       (element) => element.languageCode == langCode,
@@ -40,6 +40,6 @@ class LocalizationService extends Translations {
     );
     print(" local data ${locale.languageCode}");
     Get.updateLocale(locale);
-    print("🌐 Language Changed to: $langCode");
+    print(" Language Changed to: $langCode");
   }
 }

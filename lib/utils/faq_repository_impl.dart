@@ -58,7 +58,7 @@ class FaqRepositoryImpl {
         return ApiResponse.success(data: faqModel);
       } else {
         return ApiResponse.error(
-          // error: ApiUtils.getApiError(null), // 👈 Fix here
+          // error: ApiUtils.getApiError(null), //  Fix here
           errorMsg: faqModel.message ?? "Something went wrong",
         );
       }
@@ -66,13 +66,13 @@ class FaqRepositoryImpl {
       log("FAQ API DioException: ${error.message}");
       final errorModel = FaqModel.fromJson(error.response?.data ?? {});
       return ApiResponse.error(
-        error: ApiUtils.getApiError(error), // ✅ Correct here
+        error: ApiUtils.getApiError(error), //  Correct here
         errorMsg: errorModel.message ?? "Server error",
       );
     } catch (e) {
       log("FAQ API Exception: $e");
       return ApiResponse.error(
-        // error: ApiUtils.getApiError(), // 👈 Optional
+        // error: ApiUtils.getApiError(), //  Optional
         errorMsg: "Unexpected error",
       );
     }

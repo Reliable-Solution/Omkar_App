@@ -248,16 +248,16 @@ class EditProfileController extends GetxController
   }
 
   getData() {
-    cFullName.text = m1.value!.customerName!;
-    cPhoneNo.text = m1.value!.customerPhoneNo!;
-    cEmail.text = m1.value!.customerEmailId!;
-    cPincode.text = m1.value!.customerCode!;
-    print("Profile name : ${cFullName.text}");
-    print("Profile name : ${cPhoneNo.text}");
-    print("Profile name : ${cEmail.text}");
-    print("Profile name : ${cPincode.text}");
-    // print("Profile name : ${cFullName.text}");
-    // update();
+    if (m1.value != null) {
+      cFullName.text = m1.value!.customerName ?? '';
+      cPhoneNo.text = m1.value!.customerPhoneNo ?? '';
+      cEmail.text = m1.value!.customerEmailId ?? '';
+      cPincode.text = m1.value!.customerCode ?? '';
+
+      debugPrint("Profile name : ${cFullName.text}");
+      debugPrint("Profile phone : ${cPhoneNo.text}");
+      debugPrint("Profile email : ${cEmail.text}");
+    }
   }
 
   @override
@@ -315,24 +315,23 @@ class EditProfileController extends GetxController
     try {
       isLoading.value = true;
 
-      print("Edit Profile Phone Number ${m1.value!.customerPhoneNo}");
-      String fileName = path!.split('/').last;
+      debugPrint("Edit Profile Phone Number ${m1.value?.customerPhoneNo}");
+      String fileName = (path != null && path.isNotEmpty)
+          ? path.split('/').last
+          : "";
       final Map<String, dynamic> body = {
-        'CustomerId': m1.value!.customerId,
+        'CustomerId': m1.value?.customerId ?? '',
         'CustomerName': cFullName.text,
         'CustomerEmailId': cEmail.text,
         'CustomerGender': "",
         'CustomerPhoneNo': cPhoneNo.text ?? m1.value!.customerPhoneNo,
         // 'CustomerGender': firmId,
-        if (path.isNotEmpty)
-          'CustomerImage': path.isEmpty
-              ? ""
-              : await dio.MultipartFile.fromFile(
-                  path,
-                  filename: fileName,
-                  contentType: MediaType('image', 'jpeg'), // or 'png' if needed
-                ),
-        // path!.value,
+        if (path != null && path.isNotEmpty)
+          'CustomerImage': await dio.MultipartFile.fromFile(
+            path,
+            filename: fileName,
+            contentType: MediaType('image', 'jpeg'),
+          ),
       };
 
       print("Edit Profile Body Data ${body[0]}");
@@ -346,9 +345,11 @@ class EditProfileController extends GetxController
           msg: "Profile Edited Successfully",
           gravity: ToastGravity.BOTTOM,
         );
-        Get.back();
-        GetProfile(customerId: m1.value!.customerId!);
+        if (m1.value?.customerId != null) {
+          await GetProfile(customerId: m1.value!.customerId!);
+        }
         update();
+        Get.back();
       } else {
         throw Exception("Error from API: ${response.data['Message']}");
       }
@@ -370,6 +371,7 @@ class EditProfileController extends GetxController
         endpoint: "getCustomerProfile",
         body: body,
       );
+      print("Response Data ${response.data}");
       if (response.data['IsSuccess'] == true) {
         print("============ Data added SuccessFully in Update Profile");
         print(
@@ -379,12 +381,19 @@ class EditProfileController extends GetxController
 
         if (response.data['Data'] != null && response.data['Data'].isNotEmpty) {
           String? existingPhoneNo = m1.value?.customerPhoneNo;
+
+          // Parse the model
           m1.value = CustomerModel.fromJson(response.data['Data'][0]);
-          getData(); // Sirf yahan call karo
-          if (m1.value == null) {
-            m1.value!.customerPhoneNo =
-                existingPhoneNo ?? m1.value!.customerPhoneNo;
+
+          // If profile update didn't return phone, restore from existing
+          if (m1.value != null &&
+              (m1.value!.customerPhoneNo == null ||
+                  m1.value!.customerPhoneNo!.isEmpty)) {
+            m1.value!.customerPhoneNo = existingPhoneNo;
           }
+
+          getData(); // Sync controllers with the new data
+
           // CustomerModel customerModel = CustomerModel.fromJson(response.data['Data'][0]);
 
           // String? oldPhoneNo = m1.value?.customerPhoneNo;

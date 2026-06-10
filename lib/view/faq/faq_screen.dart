@@ -43,7 +43,9 @@ class FaqScreen extends StatelessWidget {
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return Center(child: CircularProgressIndicator(color: COLOR.appBaseColor,));
+          return Center(
+            child: CircularProgressIndicator(color: COLOR.appBaseColor),
+          );
         }
 
         final dataList = controller.isSearching.value
@@ -53,8 +55,10 @@ class FaqScreen extends StatelessWidget {
         return Column(
           children: [
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 15),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 8.0,
+                vertical: 15,
+              ),
               child: Container(
                 height: 60,
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -63,9 +67,10 @@ class FaqScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(15),
                   boxShadow: const [
                     BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 6,
-                        offset: Offset(0, 2))
+                      color: Colors.black12,
+                      blurRadius: 6,
+                      offset: Offset(0, 2),
+                    ),
                   ],
                 ),
                 child: Row(
@@ -90,8 +95,9 @@ class FaqScreen extends StatelessWidget {
                       ),
                     ),
                     GestureDetector(
-                      onTap: () => controller
-                          .searchCategory(controller.searchController.text),
+                      onTap: () => controller.searchCategory(
+                        controller.searchController.text,
+                      ),
                       child: const Icon(Icons.search, color: Colors.black87),
                     ),
                   ],
@@ -101,16 +107,40 @@ class FaqScreen extends StatelessWidget {
             const SizedBox(height: 10),
             Padding(
               padding: EdgeInsets.only(bottom: 8),
-              child: Text(StringRes.faq,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              child: Text(
+                StringRes.faq,
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
             ),
             const SizedBox(height: 10),
             Expanded(
               child: dataList.isEmpty
-                  ? Center(child: Image.asset(""))
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            "assets/images/faq_placeholder.png",
+                            height: MediaQuery.of(context).size.height * 0.35,
+                            fit: BoxFit.contain,
+                          ),
+                          const SizedBox(height: 02),
+                          Text(
+                            "No FAQs found",
+                            style: GoogleFonts.poppins(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w200,
+                              color: COLOR.appBaseColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
                   : Container(
                       padding: const EdgeInsets.symmetric(
-                          vertical: 5, horizontal: 5),
+                        vertical: 5,
+                        horizontal: 5,
+                      ),
                       child: ToggleList(
                         divider: const Divider(height: 0),
                         children: List.generate(dataList.length, (index) {
@@ -142,9 +172,10 @@ class FaqScreen extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                      item.modulesDescription ??
-                                          StringRes.noDescriptionAvailable,
-                                      style: const TextStyle(fontSize: 14)),
+                                    item.modulesDescription ??
+                                        StringRes.noDescriptionAvailable,
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
                                   const SizedBox(height: 10),
                                 ],
                               ),

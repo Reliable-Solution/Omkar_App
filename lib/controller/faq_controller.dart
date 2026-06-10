@@ -50,7 +50,7 @@ class FaqController extends GetxController {
     } catch (e) {
       log("Fetch FAQ Exception: $e");
       errorMsg.value = "Something went wrong";
-      getFlutterToast(errorMsg.value, Colors.red);
+      // getFlutterToast(errorMsg.value, Colors.red);
     } finally {
       isLoading.value = false;
     }

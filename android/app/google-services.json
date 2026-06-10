@@ -7,12 +7,33 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:954350645144:android:18fbef2b8acd74208d85ed",
+        "mobilesdk_app_id": "1:954350645144:android:3ca326c5fc38ebf48d85ed",
         "android_client_info": {
-          "package_name": "com.app.omkar"
+          "package_name": "com.app.ewa"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "954350645144-1e1fuk5nb9uafmqqnvfsin0nrf37kv5o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.app.ewa",
+            "certificate_hash": "91902eb87bc4ed9bea69e257f984fe51048dcfd7"
+          }
+        },
+        {
+          "client_id": "954350645144-4avtdls52aj6tgfq8l5df4ivqa4tj1v9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.app.ewa",
+            "certificate_hash": "973a3d7c6e2cd579fe5101f3a3431fef7aa12c13"
+          }
+        },
+        {
+          "client_id": "954350645144-572u434d3jrdopaca38ucl502ugoa09i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDWSzs6QLPNFkwyLXxeYveSNsQ0XO2r978"
@@ -20,7 +41,151 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "954350645144-572u434d3jrdopaca38ucl502ugoa09i.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "954350645144-fbsb2u89eb1sjibqsljn5r4m0ocmoq93.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.app.ewa"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:954350645144:android:18fbef2b8acd74208d85ed",
+        "android_client_info": {
+          "package_name": "com.app.omkar"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "954350645144-572u434d3jrdopaca38ucl502ugoa09i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWSzs6QLPNFkwyLXxeYveSNsQ0XO2r978"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "954350645144-572u434d3jrdopaca38ucl502ugoa09i.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "954350645144-fbsb2u89eb1sjibqsljn5r4m0ocmoq93.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.app.ewa"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:954350645144:android:767a1646a2b14e718d85ed",
+        "android_client_info": {
+          "package_name": "com.ewa.appliances.official"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "954350645144-1en94q9mfd5adntnqmkntdfj7ch9epee.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ewa.appliances.official",
+            "certificate_hash": "762958e235b243edc3f146fdad9bd80bd64be9e5"
+          }
+        },
+        {
+          "client_id": "954350645144-7d61q8tntq9149mveetvg95vs3f3k5q4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ewa.appliances.official",
+            "certificate_hash": "973a3d7c6e2cd579fe5101f3a3431fef7aa12c13"
+          }
+        },
+        {
+          "client_id": "954350645144-7m5ig6m7d3940eqjehl4j3e6qa2808gc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ewa.appliances.official",
+            "certificate_hash": "91902eb87bc4ed9bea69e257f984fe51048dcfd7"
+          }
+        },
+        {
+          "client_id": "954350645144-572u434d3jrdopaca38ucl502ugoa09i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWSzs6QLPNFkwyLXxeYveSNsQ0XO2r978"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "954350645144-572u434d3jrdopaca38ucl502ugoa09i.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "954350645144-fbsb2u89eb1sjibqsljn5r4m0ocmoq93.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.app.ewa"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:954350645144:android:f610b5728a9956248d85ed",
+        "android_client_info": {
+          "package_name": "com.ewa.reliable"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "954350645144-572u434d3jrdopaca38ucl502ugoa09i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWSzs6QLPNFkwyLXxeYveSNsQ0XO2r978"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "954350645144-572u434d3jrdopaca38ucl502ugoa09i.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "954350645144-fbsb2u89eb1sjibqsljn5r4m0ocmoq93.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.app.ewa"
+              }
+            }
+          ]
         }
       }
     }

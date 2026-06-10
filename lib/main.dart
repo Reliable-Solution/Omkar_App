@@ -2,13 +2,13 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:app_links/app_links.dart';
-import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:omkar_app/constant/colorConst.dart';
@@ -20,7 +20,6 @@ import 'package:omkar_app/view/splash/splashScreen.dart';
 import 'Theme/nativeTheme.dart';
 import 'controller/homeController.dart';
 import 'controller/languageController.dart';
-import 'package:firebase_app_check/firebase_app_check.dart';
 
 Uri? _initialLink;
 
@@ -37,33 +36,90 @@ Future<void> main() async {
   await LocalizationService.loadTranslations();
 
   try {
-    if (Platform.isAndroid) {
-      print(" Initializing Firebase... is Android ");
-      // Android-specific code
-    } else if (Platform.isIOS) {
-      print(" Initializing Firebase... is iOS ");
-      // iOS-specific code
-    }
     print(" Initializing Firebase...");
     await Firebase.initializeApp();
-    FirebaseNotification().initNotifications();
-    await FirebaseAppCheck.instance.activate(
-      // androidProvider: AppCheckProvider.playIntegrity,  // Production
-      // androidProvider: AppCheckProvider.debug,  // Test
-      // appleProvider: AppCheckProvider.appAttest,
-      androidProvider: AndroidProvider.debug,
-      appleProvider: AppleProvider.appAttest, // iOS
-    );
-    print(" Firebase initialized.");
+
+    if (Platform.isAndroid) {
+      print("✅ Firebase initialized on Android ");
+    } else if (Platform.isIOS) {
+      print("✅ Firebase initialized on iOS ");
+
+      // Request user permission for iOS notifications (AFTER Firebase init)
+      try {
+        await FirebaseMessaging.instance.requestPermission(
+          alert: true,
+          announcement: true,
+          badge: true,
+          carPlay: false,
+          criticalAlert: false,
+          provisional: false,
+          sound: true,
+        );
+        print("✅ iOS notification permission requested");
+      } catch (e) {
+        print("⚠️ iOS notification permission error: $e");
+      }
+
+      // Get APNS token for iOS - Essential for Phone Auth
+      // WAIT LONGER - Give iOS more time to get APNS token
+      try {
+        // First attempt
+        String? apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+
+        if (apnsToken != null && apnsToken.isNotEmpty) {
+          print("✅ APNS Token received: ${apnsToken.substring(0, 20)}...");
+        } else {
+          print("⚠️ APNS Token not available on first attempt, waiting...");
+
+          // Wait a bit longer and try again
+          await Future.delayed(const Duration(seconds: 2));
+
+          apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+          if (apnsToken != null && apnsToken.isNotEmpty) {
+            print(
+              "✅ APNS Token received after delay: ${apnsToken.substring(0, 20)}...",
+            );
+          } else {
+            print("⚠️ APNS Token not available - Will use reCAPTCHA fallback");
+          }
+        }
+      } catch (e) {
+        print("⚠️ APNS Token error: $e");
+        print("ℹ️ Phone Auth will use reCAPTCHA fallback");
+      }
+
+      // Additional delay to ensure AppDelegate has set up APNS
+      await Future.delayed(const Duration(milliseconds: 500));
+      print("✅ iOS notification setup complete - Phone Auth ready");
+    }
+
+    // Initialize notifications with error handling
+    try {
+      FirebaseNotification().initNotifications();
+    } catch (e) {
+      print("⚠️ Firebase notifications initialization error: $e");
+    }
+
+    try {
+      await FirebaseAppCheck.instance.activate(
+        androidProvider: AndroidProvider.debug,
+        appleProvider: AppleProvider.debug,
+      );
+      print("✅ Firebase App Check activated in Debug Mode");
+    } catch (e) {
+      print("⚠️ Firebase App Check activation error: $e");
+    }
+    print("✅ Firebase initialized successfully.");
   } catch (e) {
-    print(" Firebase init error: $e");
+    print("❌ Firebase init error: $e");
+    rethrow;
   }
 
   try {
     await GetStorage.init();
-    print("🟢 GetStorage initialized.");
+    print(" GetStorage initialized.");
   } catch (e) {
-    print("❌ GetStorage init error: $e");
+    print(" GetStorage init error: $e");
   }
 
   // Add this for debugging Firebase issues
@@ -147,8 +203,8 @@ void _handleDeepLink(Uri link) async {
 
   print("========> Scheme Path Name : ${link.path}");
   String schemeUrl = link.scheme.toString();
-  print(schemeUrl.compareTo("jantunashak") == 0);
-  if (schemeUrl.compareTo("jantunashak") == 0) {
+  print(schemeUrl.compareTo("ewaappliances") == 0);
+  if (schemeUrl.compareTo("ewaappliances") == 0) {
     final productId = link.pathSegments.last;
     final homeController = Get.find<HomeController>();
     await homeController.getProductData(productId);

@@ -7,6 +7,7 @@ import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 //packages
@@ -17,6 +18,7 @@ import 'package:omkar_app/controller/authController.dart';
 import 'package:omkar_app/controller/editController.dart';
 import 'package:omkar_app/controller/homeController.dart';
 import 'package:omkar_app/controller/registrationController.dart';
+import 'package:omkar_app/controller/addUserController.dart';
 import 'package:omkar_app/utils/services/firebase_authenticate.dart';
 import 'package:sms_autofill/sms_autofill.dart';
 import '../models/customerModel.dart';
@@ -35,7 +37,22 @@ class OTPController extends GetxController {
   // AuthController authController = AuthController();
   RegistrationController registrationController = RegistrationController();
   SharedHelper helper = SharedHelper();
-  AuthController authController = Get.put(AuthController());
+  late AuthController authController;
+
+  @override
+  void onInit() {
+    fFirstText = FocusNode();
+    fSecondText = FocusNode();
+    fThirdText = FocusNode();
+    fFourText = FocusNode();
+    fFiveText = FocusNode();
+    fSixText = FocusNode();
+    startTimer();
+    super.onInit();
+    // Find existing AuthController instead of creating new one
+    authController = Get.find<AuthController>();
+  }
+
   // AuthController authController = Get.find<
   //     AuthController>(); // Find for shared state
 
@@ -47,7 +64,7 @@ class OTPController extends GetxController {
   FocusNode? fFourText;
   FocusNode? fFiveText;
   FocusNode? fSixText;
-  RxInt secondsRemaining = 60.obs;
+  RxInt secondsRemaining = 120.obs;
   RxBool isResendEnabled = false.obs;
   Timer? _timer;
   var otpCode = "".obs;
@@ -57,21 +74,24 @@ class OTPController extends GetxController {
   RxBool isLoading = false.obs;
   RxString v = "".obs;
   CustomerModel? m1 = CustomerModel();
+  
+  // Prevent multiple concurrent OTP verification requests
+  bool _isVerificationInProgress = false;
 
-  @override
-  void onInit() async {
-    fFirstText = FocusNode();
-    fSecondText = FocusNode();
-    fThirdText = FocusNode();
-    fFourText = FocusNode();
-    fFiveText = FocusNode();
-    fSixText = FocusNode();
-    startTimer();
-    super.onInit();
-  }
+  // @override
+  // void onInit() async {
+  //   fFirstText = FocusNode();
+  //   fSecondText = FocusNode();
+  //   fThirdText = FocusNode();
+  //   fFourText = FocusNode();
+  //   fFiveText = FocusNode();
+  //   fSixText = FocusNode();
+  //   startTimer();
+  //   super.onInit();
+  // }
 
   void startTimer() {
-    secondsRemaining.value = 60;
+    secondsRemaining.value = 120;
     isResendEnabled.value = false;
 
     _timer?.cancel();
@@ -91,7 +111,7 @@ class OTPController extends GetxController {
     if (isResendEnabled.value) {
       startTimer();
       // authController.sendOTP(context, phoneNumber);
-      authController.sendFirebaseOTP(context);
+      authController.sendFirebaseOTP(context, navigateToOtp: false);
       print("Resending OTP via mobile...");
     }
   }
@@ -114,34 +134,6 @@ class OTPController extends GetxController {
     }
   }
 
-  // Firebase Verify (no API)
-  // Future<void> verifyFirebaseOtp(BuildContext context, String otp,
-  //     [String? phoneNumber]) async
-  // {
-  //   isLoading.value = true;
-  //   update();
-  //
-  //   try {
-  //     if (otp.length != 6) {
-  //       throw "Enter a valid 6-digit OTP";
-  //     }
-  //
-  //     // Delegate to AuthController
-  //     await authController.verifyFirebaseOTP(otp, context);
-  //
-  //     // Success pe AuthController navigate karega, yahan extra work
-  //     m1 = await helper.getCustomer(); // If needed
-  //     editProfileController.GetProfile(customerId: m1?.customerId ?? '');
-  //     // getFlutterToast("Login Successfully", Colors.green.shade900);
-  //     homeController.getPrefs();
-  //     homeController.getDashboardData(m1?.customerId);
-  //     isLoading.value = false;
-  //   } catch (e) {
-  //     isLoading.value = false;
-  //     print("CATCH verifyOtp: $e");
-  //     getFlutterToast("Failed to verify OTP: Wrong or expired.", Colors.red);
-  //     // Wrong pe ruk ja
-  //   }
   //   Future<void> verifyPhoneOtp(BuildContext context, String otp,
   //       String phoneNumber) async {
   //     try {
@@ -210,20 +202,100 @@ class OTPController extends GetxController {
   //   }
   // }
   Future<void> verifyLoginOtp(String otp, BuildContext context) async {
+    // Prevent multiple concurrent verification requests
+    if (_isVerificationInProgress) {
+      debugPrint("✗ OTP verification already in progress. Ignoring duplicate request.");
+      return;
+    }
+
+    _isVerificationInProgress = true;
     try {
       isLoading.value = true;
       update();
-      // await authController.firebaseAuth.signInWithCredential(credential);
-      // Use AuthController's verificationId
-      PhoneAuthCredential credential = PhoneAuthProvider.credential(
-        verificationId: authController.verificationId.value,
-        smsCode: otp,
+      final verificationId = authController.verificationId.value;
+      debugPrint(
+        "==> verifyLoginOtp: verificationId = ${authController.verificationId.value}",
       );
-      await authController.firebaseAuth.signInWithCredential(credential);
-      // await FirebaseAuth.instance.signInWithCredential(credential);
-      await authController.completeLogin(); // Login success work
+      debugPrint("==> verifyLoginOtp: OTP = $otp");
+      debugPrint(
+        "==> verifyLoginOtp: customerModel = ${authController.customerModel.value?.customerName}, customerId = ${authController.customerModel.value?.customerId}",
+      );
+
+      // Validate verificationId before creating credential
+      if (verificationId.isEmpty) {
+        throw FirebaseAuthException(
+          code: 'invalid-verification-id',
+          message: 'Verification ID is empty. Please request OTP again.',
+        );
+      }
+
+      if (otp.isEmpty || otp.length < 6) {
+        throw FirebaseAuthException(
+          code: 'invalid-verification-code',
+          message: 'Please enter a valid 6-digit OTP.',
+        );
+      }
+
+      try {
+        PhoneAuthCredential credential = PhoneAuthProvider.credential(
+          verificationId: verificationId,
+          smsCode: otp.trim(),
+        );
+        
+        debugPrint("✓ PhoneAuthCredential created successfully");
+        
+        await authController.firebaseAuth.signInWithCredential(credential);
+        debugPrint("✓ Firebase credential signed in successfully");
+        
+        await authController.completeLogin(); // Login success work
+      } on FirebaseAuthException catch (firebaseEx) {
+        throw firebaseEx; // Re-throw for handling below
+      } on PlatformException catch (platEx) {
+        // Handle platform-specific errors (especially iOS)
+        debugPrint("✗ PlatformException in credential sign-in: ${platEx.code} - ${platEx.message}");
+        
+        if (platEx.code.contains('nil') || platEx.code.contains('unwrap')) {
+          throw FirebaseAuthException(
+            code: 'authentication-failed',
+            message: 'Authentication service error on iOS. Please try again.',
+          );
+        }
+        
+        throw platEx;
+      }
+    } on FirebaseAuthException catch (e) {
+      String errorMsg;
+
+      switch (e.code) {
+        case 'invalid-verification-code':
+          errorMsg = "Wrong OTP entered. Please try again.";
+          break;
+        case 'invalid-verification-id':
+        case 'session-expired':
+          errorMsg = "Session expired. Please request a new OTP.";
+          break;
+        case 'too-many-requests':
+          errorMsg = "Too many attempts. Try again later.";
+          break;
+        case 'authentication-failed':
+          errorMsg = e.message ?? "Authentication failed. Please try again.";
+          break;
+        default:
+          errorMsg = e.message ?? "Authentication failed. Please try again.";
+      }
+
+      debugPrint("==> FirebaseAuthException: ${e.code} - ${e.message}");
+      getFlutterToast(errorMsg, Colors.red);
+    } on PlatformException catch (e) {
+      debugPrint("==> PlatformException: ${e.code} - ${e.message}");
+      getFlutterToast("Platform error: ${e.message}", Colors.red);
     } catch (e) {
+      debugPrint("==> verifyLoginOtp ERROR: $e");
       getFlutterToast(_getErrorMsg(e.toString()), Colors.red);
+    } finally {
+      isLoading.value = false;
+      _isVerificationInProgress = false;
+      update();
     }
   }
 
@@ -235,33 +307,75 @@ class OTPController extends GetxController {
     String phoneNumber = "",
     String referCode = "",
   }) async {
+    // Prevent multiple concurrent verification requests
+    if (_isVerificationInProgress) {
+      debugPrint("✗ OTP verification already in progress. Ignoring duplicate request.");
+      return;
+    }
+
+    _isVerificationInProgress = true;
     try {
       isLoading.value = true;
       update();
 
-      // Get the OTP screen widget to access the registration details
-      // final OTPVerificationScreen? otpScreen = context.findAncestorWidgetOfExactType<OTPVerificationScreen>();
-      // if (otpScreen?.name == null || otpScreen?.name?.isEmpty == true) {
-      //   throw Exception("Name is required for registration");
-      // }
+      final verificationId = authController.verificationId.value;
 
-      // Verify OTP with Firebase
-      PhoneAuthCredential credential = PhoneAuthProvider.credential(
-        verificationId: authController.verificationId.value,
-        smsCode: otp.trim(),
-      );
+      // Validate verificationId before creating credential
+      if (verificationId.isEmpty) {
+        throw FirebaseAuthException(
+          code: 'invalid-verification-id',
+          message: 'Verification ID is empty. Please request OTP again.',
+        );
+      }
 
-      // Sign in with the credential
-      await authController.firebaseAuth.signInWithCredential(credential);
+      if (otp.isEmpty || otp.length < 6) {
+        throw FirebaseAuthException(
+          code: 'invalid-verification-code',
+          message: 'Please enter a valid 6-digit OTP.',
+        );
+      }
+
+      try {
+        // Verify OTP with Firebase
+        PhoneAuthCredential credential = PhoneAuthProvider.credential(
+          verificationId: verificationId,
+          smsCode: otp.trim(),
+        );
+
+        debugPrint("✓ PhoneAuthCredential created for registration");
+
+        // Sign in with the credential
+        await authController.firebaseAuth.signInWithCredential(credential);
+        
+        debugPrint("✓ Firebase credential signed in for registration");
+      } on FirebaseAuthException catch (firebaseEx) {
+        throw firebaseEx;
+      } on PlatformException catch (platEx) {
+        // Handle platform-specific errors (especially iOS)
+        debugPrint("✗ PlatformException in registration: ${platEx.code} - ${platEx.message}");
+        
+        if (platEx.code.contains('nil') || platEx.code.contains('unwrap')) {
+          throw FirebaseAuthException(
+            code: 'authentication-failed',
+            message: 'Authentication service error on iOS. Please try again.',
+          );
+        }
+        
+        throw platEx;
+      }
 
       // After successful verification, register the user with backend
-      print("======> Otp Controller Registering user with name: $name");
+      print("=======> Otp Controller Registering user with name: $name");
+      print("=======> Verification ID: $verificationId");
+
       final Map<String, dynamic> body = {
-        'CustomerName': name ?? '',
+        'CustomerName': name,
         'CustomerEmailId': '',
-        'CustomerPhoneNo': authController.phoneNumber.value ?? phoneNumber,
-        'CustomerFCMToken': authController.tokenGet.value ?? referCode,
-        'ReferCode': referCode ?? '',
+        'CustomerPhoneNo': authController.phoneNumber.value.isEmpty
+            ? phoneNumber
+            : authController.phoneNumber.value,
+        'CustomerFCMToken': authController.tokenGet.value,
+        'ReferCode': referCode,
         'FirmId': firmId,
       };
 
@@ -274,52 +388,72 @@ class OTPController extends GetxController {
           ? jsonDecode(response.data)
           : response.data;
 
-      if (res['IsSuccess'] == true &&
-          res["Data"] is List &&
-          res["Data"].isNotEmpty) {
-        print("===========> Responces Data ${response.data}");
-        // CustomerModel customer = CustomerModel.fromJson(res["Data"][0]);
-        CustomerModel customer;
-        if (res["Data"] is List && res["Data"].isNotEmpty) {
-          customer = CustomerModel.fromJson(res["Data"][0]);
-        } else {
-          customer = CustomerModel.fromJson(res["Data"]);
-        }
-        authController.customerModel.value = customer;
-        await helper.setCustomer(customer, "OTP Controller Register");
-        authController.setRegisterFlow(false);
-        editProfileController.GetProfile(
-          customerId: authController.customerModel.value!.customerId!,
-        );
-        homeController.getPrefs();
-        homeController.getDashboardData(
-          authController.customerModel.value?.customerId,
-        );
-        getFlutterToast("Registration Successful", Colors.green);
-        Future.delayed(const Duration(seconds: 1), () {
+      if (res['IsSuccess'] == true || res['IsSuccess'] == 'true') {
+        if ((res["Data"] is List && res["Data"].isNotEmpty) ||
+            (res["Data"] is Map && res["Data"].isNotEmpty)) {
+          print("===========> Responces Data ${response.data}");
+          // CustomerModel customer = CustomerModel.fromJson(res["Data"][0]);
+          CustomerModel customer;
+          if (res["Data"] is List && res["Data"].isNotEmpty) {
+            customer = CustomerModel.fromJson(res["Data"][0]);
+          } else {
+            customer = CustomerModel.fromJson(res["Data"]);
+          }
+          authController.customerModel.value = customer;
+          await helper.setCustomer(customer, "OTP Controller Register");
+          authController.setRegisterFlow(false);
+          await editProfileController.GetProfile(
+            customerId: authController.customerModel.value!.customerId!,
+          );
+          await homeController.getPrefs();
+          await homeController.getDashboardData(
+            authController.customerModel.value?.customerId,
+          );
+          // Clear AddUser fields only after successful OTP verification
+          if (Get.isRegistered<AddUserController>()) {
+            Get.find<AddUserController>().clearFields();
+          }
+
+          getFlutterToast("Registration Successful", Colors.green);
+          // await Future.delayed(const Duration(seconds: 1));
           Get.offAll(() => DashboardScreen(pageIndex: 0));
-        });
+        } else {
+          isLoading.value = false;
+          update();
+          getFlutterToast("Registration failed: No data found.", Colors.red);
+        }
       } else {
         throw Exception(res['Message'] ?? "Register failed.");
       }
+    } on FirebaseAuthException catch (e) {
+      debugPrint("==> FirebaseAuthException in registration: ${e.code} - ${e.message}");
+      isLoading.value = false;
+      update();
+      authController.setRegisterFlow(false);
+      getFlutterToast(_getErrorMsg(e.toString()), Colors.red);
+    } on PlatformException catch (e) {
+      debugPrint("==> PlatformException in registration: ${e.code} - ${e.message}");
+      isLoading.value = false;
+      update();
+      authController.setRegisterFlow(false);
+      getFlutterToast("Platform error during registration: ${e.message}", Colors.red);
     } catch (e) {
       print("===========> OTP CONTROLLER $e");
+      isLoading.value = false;
+      update();
       authController.setRegisterFlow(false);
       getFlutterToast(_getErrorMsg(e.toString()), Colors.red);
     } finally {
-      isLoading.value = false;
-      update();
+      _isVerificationInProgress = false;
     }
   }
 
   String _getErrorMsg(String error) {
-    // String lowerError = rawError.toLowerCase();
     String lowerError = error.toLowerCase();
 
     if (lowerError.contains('invalid-verification-code') ||
-        lowerError.contains('signinwithcredential') ||
-        lowerError.contains('pigeon') ||
-        lowerError.contains('wrong') ||
+        lowerError.contains('invalid-otp') ||
+        lowerError.contains('wrong-otp') ||
         lowerError.contains('invalid code')) {
       return "Wrong OTP. Check and retry!";
     } else if (lowerError.contains('session-expired') ||
@@ -329,8 +463,18 @@ class OTPController extends GetxController {
       return "Too many tries. Wait 1 min.";
     } else if (lowerError.contains('invalid-verification-id')) {
       return "Session invalid. Login again.";
+    } else if (lowerError.contains('admin-restricted-operation')) {
+      return "This operation is restricted. Please check your admin settings.";
+    } else if (lowerError.contains('internal-error')) {
+      return "An internal error occurred. Please try again later.";
+    } else if (lowerError.contains('network-request-failed')) {
+      return "Network error. Please check your internet connection.";
+    } else if (lowerError.contains('user-disabled')) {
+      return "This user has been disabled. Contact support.";
+    } else if (lowerError.contains('quota-exceeded')) {
+      return "SMS quota exceeded. Please try again later.";
     } else {
-      return "Verification failed. Try again.";
+      return "Verification failed: $error"; // Return full error for debugging if unknown
     }
     // Tera smart error logic yahan paste kar
     // if (error.contains('invalid-verification-code')) return "Wrong OTP.";

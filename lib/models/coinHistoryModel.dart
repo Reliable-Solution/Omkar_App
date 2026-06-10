@@ -61,30 +61,34 @@ class CoinHistoryModel {
   String? pointTransactionNo;
   String? pointStatus;
   String? pointCDT;
+  String? value;
 
-  CoinHistoryModel(
-      {this.pointId,
-        this.orderId,
-        this.customerId,
-        this.pointDescription,
-        this.pointType,
-        this.pointDate,
-        this.pointTotal,
-        this.pointTransactionNo,
-        this.pointStatus,
-        this.pointCDT});
+  CoinHistoryModel({
+    this.pointId,
+    this.orderId,
+    this.customerId,
+    this.pointDescription,
+    this.pointType,
+    this.pointDate,
+    this.pointTotal,
+    this.pointTransactionNo,
+    this.pointStatus,
+    this.pointCDT,
+    this.value,
+  });
 
   CoinHistoryModel.fromJson(Map<String, dynamic> json) {
-    pointId = json['PointId'];
+    pointId = json['PointId'] ?? json['RedeemId'];
     orderId = json['OrderId'];
     customerId = json['CustomerId'];
-    pointDescription = json['PointDescription'];
-    pointType = json['PointType'];
-    pointDate = json['PointDate'];
-    pointTotal = json['PointTotal'];
+    pointDescription = json['PointDescription'] ?? json['Description'];
+    pointType = json['PointType'] ?? "Redeem";
+    pointDate = json['PointDate'] ?? json['RedeemCDT'];
+    pointTotal = json['PointTotal'] ?? json['RedeemPoints'];
     pointTransactionNo = json['PointTransactionNo'];
-    pointStatus = json['PointStatus'];
-    pointCDT = json['PointCDT'];
+    pointStatus = json['PointStatus'] ?? json['RedeemStatus'];
+    pointCDT = json['PointCDT'] ?? json['RedeemCDT'];
+    value = json['Value']?.toString();
   }
 
   Map<String, dynamic> toJson() {
@@ -99,9 +103,11 @@ class CoinHistoryModel {
     data['PointTransactionNo'] = this.pointTransactionNo;
     data['PointStatus'] = this.pointStatus;
     data['PointCDT'] = this.pointCDT;
+    data['Value'] = this.value;
     return data;
   }
 }
+
 // Response model for the API
 class PointHistoryResponse {
   bool isSuccess;
@@ -116,12 +122,14 @@ class PointHistoryResponse {
 
   factory PointHistoryResponse.fromJson(Map<String, dynamic> json) {
     var dataList = json['Data'] as List;
-    List<CoinHistoryModel> historyList = dataList.map((item) =>
-        CoinHistoryModel.fromJson(item)).toList();
+    List<CoinHistoryModel> historyList = dataList
+        .map((item) => CoinHistoryModel.fromJson(item))
+        .toList();
 
     return PointHistoryResponse(
       isSuccess: json['IsSuccess'] ?? false,
       message: json['Message'] ?? '',
       data: historyList,
     );
-  }}
+  }
+}

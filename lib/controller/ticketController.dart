@@ -36,6 +36,7 @@ class TicketController extends GetxController {
     TicketRepositoryImpl(),
   );
   final userNameController = TextEditingController();
+  final phoneController = TextEditingController();
   final descriptionController = TextEditingController();
   final facingController = TextEditingController();
   final SharedHelper sharedPrefs = SharedHelper();
@@ -95,6 +96,7 @@ class TicketController extends GetxController {
     if (customer != null) {
       customerModel!.value = customer;
       userNameController.text = customer.customerName ?? "";
+      phoneController.text = customer.customerPhoneNo ?? "";
       // Assume firmId is stored in SharedPrefs or passed from another controller
       // firmId = firmId; // Replace with actual logic
       log("Customer: ${customer.customerName}, FirmId: $firmId");
@@ -169,10 +171,13 @@ class TicketController extends GetxController {
 
       Map<String, dynamic> bodyData = {
         "CustomerId": customerModel!.value.customerId,
-        "TicketsPhoneNo": customerModel!.value.customerPhoneNo ?? "",
+        "TicketsPhoneNo": phoneController.text.trim().isEmpty
+            ? (customerModel!.value.customerPhoneNo ?? "")
+            : phoneController.text.trim(),
         "TicketsUserName": userNameController.text.trim(),
         "TicketsDescription": descriptionController.text.trim(),
-        "FirmId": 2,
+        "TicketsStage": "open",
+        "FirmId": firmId ?? "1",
       };
 
       if (selectedFile.value != null && selectedFile.value!.existsSync()) {
@@ -205,6 +210,7 @@ class TicketController extends GetxController {
         selectedTicketSubAreaProblemID.value = null;
         selectedTicketPriorityID.value = null;
         descriptionController.clear();
+        phoneController.clear();
         selectedFile.value = null;
         facingController.clear();
         tabIndex.value = 1;
@@ -267,6 +273,12 @@ class TicketController extends GetxController {
         isError: true,
         context: context,
       );
+    } else if (phoneController.text.trim().isEmpty) {
+      showSnackBar(
+        msg: "Please enter the phone number",
+        isError: true,
+        context: context,
+      );
     } else if (descriptionController.text.trim().isEmpty) {
       showSnackBar(
         msg: "Please enter the description",
@@ -321,7 +333,13 @@ class TicketRepositoryImpl extends TicketRepository {
       log(
         "Parsed AddTicketModel: isSuccess=${addTicketResponse.isSuccess}, message=${addTicketResponse.message}, data=${addTicketResponse.data}",
       );
-      return ApiResponse.success(data: addTicketResponse);
+      if (addTicketResponse.isSuccess == true) {
+        return ApiResponse.success(data: addTicketResponse);
+      } else {
+        return ApiResponse.error(
+          errorMsg: addTicketResponse.message ?? 'Failed to create ticket',
+        );
+      }
     } on dio.DioException catch (error) {
       log(
         "addTicket error: ${error.response?.data}, ${error.message}, ${error.response?.statusCode}, type: ${error.type}",

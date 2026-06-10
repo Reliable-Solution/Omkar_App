@@ -338,6 +338,8 @@ import 'package:omkar_app/utils/string_res.dart';
 // import 'package:getxnative/widget/iconButtonWidget.dart';
 // import 'package:getxnative/widget/textButtonWidget.dart';
 // import 'package:getxnative/widget/textWidget.dart';
+import '../../controller/editController.dart';
+import '../../constant/app_constant.dart';
 
 import '../../Theme/nativeTheme.dart';
 import '../../constant/colorConst.dart';
@@ -351,6 +353,8 @@ import 'editProfile.dart';
 
 class ProfileScreen extends StatelessWidget {
   ProfileScreen({Key? key}) : super(key: key);
+
+  final EditProfileController controller = Get.find<EditProfileController>();
 
   @override
   Widget build(BuildContext context) {
@@ -417,200 +421,252 @@ class ProfileScreen extends StatelessWidget {
         ],
       ),
       backgroundColor: COLOR.greyLight,
-      body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            Container(
-              color: COLOR.background,
-              child: Stack(
-                clipBehavior: Clip.hardEdge,
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: <Widget>[
-                      Container(
-                        height: MediaQuery.of(context).size.height * 0.23,
-                        decoration: BoxDecoration(
-                          color: COLOR.pink.withOpacity(0.2),
-                          image: DecorationImage(
-                            colorFilter: new ColorFilter.mode(
-                              COLOR.black.withOpacity(0.8),
-                              BlendMode.dstATop,
+      body: Obx(() {
+        final customer = controller.m1.value;
+        return SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              Container(
+                color: COLOR.background,
+                child: Stack(
+                  clipBehavior: Clip.hardEdge,
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        Container(
+                          height: MediaQuery.of(context).size.height * 0.23,
+                          decoration: BoxDecoration(
+                            color: COLOR.pink.withOpacity(0.2),
+                            image: DecorationImage(
+                              colorFilter: ColorFilter.mode(
+                                COLOR.black.withOpacity(0.8),
+                                BlendMode.dstATop,
+                              ),
+                              image: const NetworkImage(
+                                "https://images.pexels.com/photos/396547/pexels-photo-396547.jpeg?auto=compress&cs=tinysrgb&h=350",
+                              ),
+                              fit: BoxFit.cover,
                             ),
-                            image: NetworkImage(
-                              "https://images.pexels.com/photos/396547/pexels-photo-396547.jpeg?auto=compress&cs=tinysrgb&h=350",
-                            ),
-                            fit: BoxFit.cover,
                           ),
                         ),
-                      ),
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.07,
-                      ),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 15,
-                          vertical: 10,
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.07,
                         ),
-                        alignment: Alignment.centerLeft,
-                        child: TextWiget(
-                          title: '{global.appname} User',
-                          style: Themes.light.textTheme.headlineSmall,
-                        ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 15),
-                        alignment: Alignment.centerLeft,
-                        child: TextWiget(
-                          title: 'Bardoli, Gujarat',
-                          style: Themes.light.textTheme.displaySmall,
-                        ),
-                      ),
-                      Container(
-                        height: MediaQuery.of(context).size.height * 0.12,
-                        padding: EdgeInsets.symmetric(
-                          vertical: 15,
-                          horizontal: 15,
-                        ),
-                        alignment: Alignment.centerLeft,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                TextWiget(
-                                  title: '0',
-                                  style: Themes.dark.textTheme.headlineMedium,
-                                ),
-                                TextWiget(
-                                  title: 'Helpfuls',
-                                  style: Themes.light.textTheme.displaySmall!
-                                      .copyWith(color: COLOR.grey),
-                                ),
-                              ],
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                TextWiget(
-                                  title: '0',
-                                  style: Themes.dark.textTheme.headlineMedium,
-                                ),
-                                TextWiget(
-                                  title: 'Followers',
-                                  style: Themes.light.textTheme.displaySmall!
-                                      .copyWith(color: COLOR.grey),
-                                ),
-                              ],
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                TextWiget(
-                                  title: '0',
-                                  style: Themes.dark.textTheme.headlineMedium,
-                                ),
-                                TextWiget(
-                                  title: 'Following',
-                                  style: Themes.light.textTheme.displaySmall!
-                                      .copyWith(color: COLOR.grey),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        child: DividerWidget(thickness: 1),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 10, left: 15, right: 15),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            TextWiget(
-                              title: 'About Me',
-                              style: Themes.light.textTheme.headlineSmall,
-                            ),
-                            TextButtonWidget(
-                              text: 'ADD DETAILS',
-                              style: Themes.light.textTheme.displaySmall!
-                                  .copyWith(
-                                    color: COLOR.pink,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                              border: 1,
-                              // onPressed: () => Get.to(() => EditProfileScreen()),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 5),
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
+                        Container(
+                          padding: const EdgeInsets.symmetric(
                             horizontal: 15,
-                            vertical: 8,
+                            vertical: 10,
                           ),
                           alignment: Alignment.centerLeft,
                           child: TextWiget(
-                            title:
-                                'Share your journey on Mesho with other customers',
-                            style: Themes.light.textTheme.displayLarge!
-                                .copyWith(color: COLOR.grey),
+                            title: customer?.customerName ?? 'User',
+                            style: Themes.light.textTheme.headlineSmall,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  Positioned(
-                    top: MediaQuery.of(context).size.height * 0.17,
-                    left: MediaQuery.of(context).size.width * 0.06,
-                    child: Stack(
-                      children: [
-                        CircleAvatar(
-                          backgroundColor: COLOR.greyLight,
-                          maxRadius: 40,
-                          backgroundImage: AssetImage(Images.profileicon),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
+                          alignment: Alignment.centerLeft,
+                          child: TextWiget(
+                            title: customer?.city ?? 'Bardoli, Gujarat',
+                            style: Themes.light.textTheme.displaySmall,
+                          ),
                         ),
-                        Positioned(
-                          bottom: 0,
-                          right: 1,
-                          child: CircleAvatar(
-                            radius: 15,
-                            backgroundColor: COLOR.grey,
-                            child: CircleAvatar(
-                              radius: 14,
-                              backgroundColor: COLOR.background,
-                              child: IconButtonWidget(
-                                icons: Icons.camera_alt_outlined,
-                                color: COLOR.black,
-                                size: 20,
-                                voidCallback: () {
-                                  ScaffoldMessenger.of(
-                                    context,
-                                  ).showSnackBar(snackBar);
-                                },
+                        Container(
+                          height: MediaQuery.of(context).size.height * 0.12,
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 15,
+                            horizontal: 15,
+                          ),
+                          alignment: Alignment.centerLeft,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  TextWiget(
+                                    title:
+                                        (customer?.points?.isNotEmpty ??
+                                                false) &&
+                                            customer?.points != "0"
+                                        ? customer!.points!
+                                        : 'No Available PTS',
+                                    style: Themes.dark.textTheme.headlineMedium!
+                                        .copyWith(
+                                          fontSize:
+                                              (customer?.points?.isNotEmpty ??
+                                                      false) &&
+                                                  customer?.points != "0"
+                                              ? 18
+                                              : 14,
+                                        ),
+                                  ),
+                                  if ((customer?.points?.isNotEmpty ?? false) &&
+                                      customer?.points != "0")
+                                    TextWiget(
+                                      title: 'Points',
+                                      style: Themes
+                                          .light
+                                          .textTheme
+                                          .displaySmall!
+                                          .copyWith(color: COLOR.grey),
+                                    ),
+                                ],
                               ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  TextWiget(
+                                    title: '0',
+                                    style: Themes.dark.textTheme.headlineMedium,
+                                  ),
+                                  TextWiget(
+                                    title: 'Followers',
+                                    style: Themes.light.textTheme.displaySmall!
+                                        .copyWith(color: COLOR.grey),
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  TextWiget(
+                                    title: '0',
+                                    style: Themes.dark.textTheme.headlineMedium,
+                                  ),
+                                  TextWiget(
+                                    title: 'Following',
+                                    style: Themes.light.textTheme.displaySmall!
+                                        .copyWith(color: COLOR.grey),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 15),
+                          child: DividerWidget(thickness: 1),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            top: 10,
+                            left: 15,
+                            right: 15,
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              TextWiget(
+                                title: 'About Me',
+                                style: Themes.light.textTheme.headlineSmall,
+                              ),
+                              TextButtonWidget(
+                                text: 'ADD DETAILS',
+                                style: Themes.light.textTheme.displaySmall!
+                                    .copyWith(
+                                      color: COLOR.pink,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                border: 1,
+                                // onPressed: () => Get.to(() => EditProfileScreen()),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 5),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 15,
+                              vertical: 8,
+                            ),
+                            alignment: Alignment.centerLeft,
+                            child: TextWiget(
+                              title:
+                                  'Share your journey on Omkar App with other customers',
+                              style: Themes.light.textTheme.displayLarge!
+                                  .copyWith(color: COLOR.grey),
                             ),
                           ),
                         ),
                       ],
                     ),
-                  ),
-                ],
+                    Positioned(
+                      top: MediaQuery.of(context).size.height * 0.17,
+                      left: MediaQuery.of(context).size.width * 0.06,
+                      child: Stack(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 3),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: CircleAvatar(
+                              backgroundColor: COLOR.greyLight,
+                              maxRadius: 40,
+                              backgroundImage:
+                                  (customer?.customerImage != null &&
+                                      customer!.customerImage!.isNotEmpty)
+                                  ? NetworkImage(
+                                          customer.customerImage!.startsWith(
+                                                'http',
+                                              )
+                                              ? customer.customerImage!
+                                              : "$IMAGE_URL${customer.customerImage}",
+                                        )
+                                        as ImageProvider
+                                  : AssetImage(Images.profileicon),
+                            ),
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: CircleAvatar(
+                              radius: 15,
+                              backgroundColor: COLOR.grey,
+                              child: CircleAvatar(
+                                radius: 14,
+                                backgroundColor: COLOR.background,
+                                child: IconButtonWidget(
+                                  icons: Icons.camera_alt_outlined,
+                                  color: COLOR.black,
+                                  size: 20,
+                                  voidCallback: () {
+                                    ScaffoldMessenger.of(
+                                      context,
+                                    ).showSnackBar(snackBar);
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
-      ),
+            ],
+          ),
+        );
+      }),
     );
   }
 

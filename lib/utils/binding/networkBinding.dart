@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:omkar_app/controller/addressController.dart';
+import 'package:omkar_app/controller/authController.dart';
 import 'package:omkar_app/controller/cartController.dart';
 import 'package:omkar_app/controller/checkoutController.dart';
 import 'package:omkar_app/controller/editController.dart';
@@ -22,7 +23,13 @@ class NetworkBinding extends Bindings {
   @override
   void dependencies() {
     Get.lazyPut<NetworkController>(() => NetworkController());
-    // Get.lazyPut<HomeController>(() => HomeController(), fenix: true);
+    
+    // Initialize HomeController FIRST (required by AuthController)
+    Get.lazyPut<HomeController>(() => HomeController(), fenix: true);
+    
+    // Initialize AuthController as permanent (singleton)
+    Get.put<AuthController>(AuthController(), permanent: true);
+    
     Get.lazyPut<DashboardController>(() => DashboardController(), fenix: true);
     Get.lazyPut<AccountController>(() => AccountController(), fenix: true);
     Get.lazyPut<ShareProductController>(

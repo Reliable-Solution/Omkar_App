@@ -127,14 +127,14 @@ class CheckoutController extends GetxController {
                 try {
                   return PaymentGateway.fromJson(e);
                 } catch (err) {
-                  log("❌ Parsing error on item: $e \nError: $err");
+                  log(" Parsing error on item: $e \nError: $err");
                   return null;
                 }
               })
               .whereType<PaymentGateway>()
               .toList();
         } else {
-          log("❌ 'Data' is not a List: $rawData");
+          log(" 'Data' is not a List: $rawData");
         }
         update();
       } else {

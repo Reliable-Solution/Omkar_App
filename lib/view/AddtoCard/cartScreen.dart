@@ -107,6 +107,7 @@ class PriceDetailsWidget extends StatelessWidget {
     );
   }
 
+
   Widget _priceRow(String title, RxString value, {bool isDiscount = false}) {
     return Obx(
       () => Row(
@@ -136,10 +137,10 @@ class CartScreen extends StatefulWidget {
 class _CartScreenState extends State<CartScreen> {
   final CartController cartController = Get.put(
     CartController(),
-  ); // ✅ Add this line
+  ); //  Add this line
   final AddressController addressController = Get.put(
     AddressController(),
-  ); // ✅ Add this line
+  ); //  Add this line
 
   // final CartController cartController = Get.find();
 
@@ -153,7 +154,7 @@ class _CartScreenState extends State<CartScreen> {
 
   bool isCartRemoveLoading = false;
   int Qty = 0;
-  bool isInitialLoading = true; // ✅ New flag for initial loader
+  bool isInitialLoading = true; //  New flag for initial loader
 
   double? productQty;
 
